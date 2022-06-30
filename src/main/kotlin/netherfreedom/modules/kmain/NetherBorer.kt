@@ -15,14 +15,14 @@ class NetherBorer:MeteorModule(NetherFreedom.MAIN, "Nether Borer", "Automaticall
 
     private val general = settings.defaultGroup
 
-    private var mode by general.add(EValue("Mode", Mode.NORMAL, "Which mode to use"))
-    private var extForward by general.add(IValue("Forwards", 5, "How many blocks to extend forward.", 1..6, 1))
-    private var extBackward by general.add(IValue("Backwards", 5, "How many blocks to extend backward.", 1..6, 1))
-    private var xOffset by general.add(IValue("XOffset", 0, "How many blocks to offset the y axis.", -2..2, 1))
-    private var zOffset by general.add(IValue("ZOffset", 0, "How many blocks to offset the z axis.", -2..2, 1))
-    private var keepY by general.add(IValue("KeepY", 119, "Keeps a specific Y level when digging.", -1..255, 1))
-    private var jumping by general.add(BValue("Fast", false, "Speed bypass that sends more packets."))
-    private var disable by general.add(BValue("Disable Jump", false, "Disable the head block jumping feature."))
+    private var mode by general.add(EValue("Mode", Mode.NORMAL, "Mode to use"))
+    private var extForward by general.add(IValue("ExtForward", 4, "How many blocks to extend forward", 1..6, 1))
+    private var extBackward by general.add(IValue("ExtBackward", 4, "How many blocks to extend backward", 1..6, 1))
+    private var xOffset by general.add(IValue("XOffset", 0, "How many blocks to offset the y axis", -2..2, 1))
+    private var zOffset by general.add(IValue("ZOffset", 0, "How many blocks to offset the z axis", -2..2, 1))
+    private var keepY by general.add(IValue("KeepY", 120, "Keeps a specific Y level when digging", -1..255, 1))
+    private var disable by general.add(BValue("Disable", false, "Disable the jumping block feature"))
+    private var jumping by general.add(BValue("Jumping", false, "Send more or less packs"))
 
     // preserve 2 block tall tunnel for speed bypass
     private var blacklist:MutableList<BlockPos> = ArrayList()
@@ -90,32 +90,26 @@ class NetherBorer:MeteorModule(NetherFreedom.MAIN, "Nether Borer", "Automaticall
             this.breakBlock(plyerPos.forward(i))
             this.breakBlock(plyerPos.forward(i).up())
             this.breakBlock(plyerPos.forward(i).up(2))
-            // Right of the player
+            this.breakBlock(plyerPos.forward(i).up(3))
             this.breakBlock(plyerPos.forward(i).right(1))
             this.breakBlock(plyerPos.forward(i).right(1).up())
             this.breakBlock(plyerPos.forward(i).right(1).up(2))
+            this.breakBlock(plyerPos.forward(i).right(1).up(3))
             this.breakBlock(plyerPos.forward(i).right(2))
             this.breakBlock(plyerPos.forward(i).right(2).up())
             this.breakBlock(plyerPos.forward(i).right(2).up(2))
-            this.breakBlock(plyerPos.forward(i).right(3))
-            this.breakBlock(plyerPos.forward(i).right(3).up())
-            this.breakBlock(plyerPos.forward(i).right(3).up(2))
-            this.breakBlock(plyerPos.forward(i).right(4))
-            this.breakBlock(plyerPos.forward(i).right(4).up())
-            this.breakBlock(plyerPos.forward(i).right(4).up(2))
-            // Left of the player
+            this.breakBlock(plyerPos.forward(i).right(2).up(3))
             this.breakBlock(plyerPos.forward(i).left(1))
             this.breakBlock(plyerPos.forward(i).left(1).up())
             this.breakBlock(plyerPos.forward(i).left(1).up(2))
+            this.breakBlock(plyerPos.forward(i).left(1).up(3))
             this.breakBlock(plyerPos.forward(i).left(2))
             this.breakBlock(plyerPos.forward(i).left(2).up())
             this.breakBlock(plyerPos.forward(i).left(2).up(2))
-            this.breakBlock(plyerPos.forward(i).left(3))
+            this.breakBlock(plyerPos.forward(i).left(2).up(3))
             this.breakBlock(plyerPos.forward(i).left(3).up())
             this.breakBlock(plyerPos.forward(i).left(3).up(2))
-            this.breakBlock(plyerPos.forward(i).left(4))
-            this.breakBlock(plyerPos.forward(i).left(4).up())
-            this.breakBlock(plyerPos.forward(i).left(4).up(2))
+            this.breakBlock(plyerPos.forward(i).left(3).up(3))
         }
     }
 
