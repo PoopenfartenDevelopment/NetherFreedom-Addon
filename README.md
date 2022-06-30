@@ -11,7 +11,7 @@
 </div>
 
 <div align="center">
-  <a href="https://discord.gg/u3XNcDZyrY "><img src="https://invidget.switchblade.xyz/u3XNcDZyrY "></a>
+  <a href="https://discord.gg/u3XNcDZyrY"><img src="https://invidget.switchblade.xyz/u3XNcDZyrY"></a>
 </div>
 
 # How to use
