@@ -1,7 +1,7 @@
 <div align="center">
   <!-- Logo and Title -->
   <img src="/src/main/resources/assets/netherfreedom/icon.png" alt="logo" width="20%"/>
-  <h1>NF Client</h1>
+  <h1>Nether Freedom Client</h1>
   <p>Nether Freedom Client is specifically to dig the nether freedom project on endcrystal.me</p>
 
   <!-- Fancy badges -->
