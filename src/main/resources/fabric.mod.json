@@ -1,31 +1,34 @@
 {
   "schemaVersion": 1,
-  "id": "addon-template",
+  "id": "nf-client",
   "version": "${version}",
-  "name": "Addon Template",
-  "description": "An addon template for the Meteor addons.",
+  "name": "NF Client",
+  "description": "Nether Freedom Project's Custom Client to dig netherrack.",
   "authors": [
-    "seasnail8169"
+    "RedCarlos26",
+    "Ethius"
   ],
   "contact": {
-    "repo": "https://github.com/MeteorDevelopment/meteor-addon-template"
+    "homepage": "https://discord.gg/u3XNcDZyrY",
+    "discord": "https://discord.gg/u3XNcDZyrY"
   },
-  "icon": "assets/template/icon.png",
+  "icon": "assets/netherfreedom/icon.png",
   "environment": "client",
   "entrypoints": {
     "meteor": [
-      "dummy.addon.template.TemplateAddon"
+      "netherfreedom.modules.NetherFreedom"
     ]
   },
   "mixins": [
-    "template.mixins.json"
+    "netherfreedom.mixins.json"
   ],
   "custom": {
-    "meteor-client:color": "225,25,25"
+    "meteor-client:color": "145,61,226"
   },
   "depends": {
     "java": ">=17",
-    "minecraft": ">=${mc_version}",
-    "meteor-client": "*"
+    "minecraft": ">=1.18.2",
+    "meteor-client": ">=0.4.7",
+    "fabric-language-kotlin": ">=1.8.0+kotlin.1.7.0"
   }
 }

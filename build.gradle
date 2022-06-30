@@ -1,5 +1,6 @@
 plugins {
-    id 'fabric-loom' version '0.10-SNAPSHOT'
+    id 'fabric-loom' version '0.11-SNAPSHOT'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.0'
 }
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
@@ -17,7 +18,11 @@ repositories {
         name = "meteor-maven-snapshots"
         url = "https://maven.meteordev.org/snapshots"
     }
-    jcenter()
+    mavenCentral()
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/netherfreedom.accesswidener")
 }
 
 dependencies {
