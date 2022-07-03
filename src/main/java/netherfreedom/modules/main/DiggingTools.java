@@ -23,12 +23,11 @@ public class DiggingTools extends Module {
 
         modules.get(AutoEat.class).toggle();
         modules.get(AutoLog.class).toggle();
-        modules.get(FreeLook.class).toggle();
         modules.get(HandManager.class).toggle();
         modules.get(InvManager.class).toggle();
         modules.get(LiquidFiller.class).toggle();
         modules.get(NetherBorer.class).toggle();
-        modules.get(Rotation.class).toggle();
+        modules.get(RotationsPlus.class).toggle();
         modules.get(SafeWalk.class).toggle();
         modules.get(ScaffoldPlus.class).toggle();
     }
@@ -39,12 +38,11 @@ public class DiggingTools extends Module {
 
         modules.get(AutoEat.class).toggle();
         modules.get(AutoLog.class).toggle();
-        modules.get(FreeLook.class).toggle();
         modules.get(HandManager.class).toggle();
         modules.get(InvManager.class).toggle();
         modules.get(LiquidFiller.class).toggle();
         modules.get(NetherBorer.class).toggle();
-        modules.get(Rotation.class).toggle();
+        modules.get(RotationsPlus.class).toggle();
         modules.get(SafeWalk.class).toggle();
         modules.get(ScaffoldPlus.class).toggle();
     }

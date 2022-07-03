@@ -1,5 +1,7 @@
 package netherfreedom.modules.main;
 
+import meteordevelopment.meteorclient.utils.misc.input.KeyBinds;
+import net.minecraft.client.option.KeyBinding;
 import netherfreedom.modules.NetherFreedom;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
@@ -88,14 +90,14 @@ public class RotationsPlus extends Module {
 
         if (arrowSnap.get()) {
             if (Input.isKeyPressed(GLFW.GLFW_KEY_LEFT) && !lDown) {
-                mc.player.setYaw(mc.player.getYaw() - 25);
+                mc.player.setYaw(mc.player.getYaw() - 45);
                 lDown = true;
             } else if (!Input.isKeyPressed (GLFW.GLFW_KEY_LEFT)) {
                 lDown = false;
             }
 
             if (Input.isKeyPressed(GLFW.GLFW_KEY_RIGHT) && !rDown) {
-                mc.player.setYaw(mc.player.getYaw() + 25);
+                mc.player.setYaw(mc.player.getYaw() + 45);
                 lDown = true;
             } else if (!Input.isKeyPressed (GLFW.GLFW_KEY_RIGHT)) {
                 lDown = false;
