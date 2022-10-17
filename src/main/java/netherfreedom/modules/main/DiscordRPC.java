@@ -71,7 +71,6 @@ public class DiscordRPC extends Module {
     );
 
     // Line 2
-
     private final Setting<List<String>> line2Strings = sgLine2.add(new StringListSetting.Builder()
             .name("line-2-messages")
             .description("Messages used for the second line.")

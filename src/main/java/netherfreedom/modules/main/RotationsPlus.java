@@ -1,7 +1,5 @@
 package netherfreedom.modules.main;
 
-import meteordevelopment.meteorclient.utils.misc.input.KeyBinds;
-import net.minecraft.client.option.KeyBinding;
 import netherfreedom.modules.NetherFreedom;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
@@ -64,13 +62,6 @@ public class RotationsPlus extends Module {
 
     @Override
     public void onActivate() {
-        onTick(null);
-        lDown = false;
-        rDown = false;
-    }
-
-    @Override
-    public void onDeactivate() {
         onTick(null);
         lDown = false;
         rDown = false;
