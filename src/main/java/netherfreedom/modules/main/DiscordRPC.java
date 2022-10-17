@@ -8,9 +8,12 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.gui.GuiTheme;
 import meteordevelopment.meteorclient.gui.WidgetScreen;
 import meteordevelopment.meteorclient.gui.widgets.WWidget;
+import meteordevelopment.meteorclient.gui.widgets.containers.WHorizontalList;
 import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.systems.modules.Modules;
+import meteordevelopment.meteorclient.systems.modules.misc.DiscordPresence;
 import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.misc.MeteorStarscript;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
@@ -43,7 +46,6 @@ public class DiscordRPC extends Module {
     private final SettingGroup sgLine2 = settings.createGroup("Line 2");
 
     // Line 1
-
     private final Setting<List<String>> line1Strings = sgLine1.add(new StringListSetting.Builder()
             .name("line-1-messages")
             .description("Messages used for the first line.")
@@ -73,7 +75,7 @@ public class DiscordRPC extends Module {
     private final Setting<List<String>> line2Strings = sgLine2.add(new StringListSetting.Builder()
             .name("line-2-messages")
             .description("Messages used for the second line.")
-            .defaultValue("{player}", "Digging Nether Freedom")
+            .defaultValue("{player}", "Actively digging", "{server.player_count} Players online")
             .onChanged(strings -> recompileLine2())
             .build()
     );
@@ -94,6 +96,12 @@ public class DiscordRPC extends Module {
             .build()
     );
 
+    public DiscordRPC() {
+        super(NetherFreedom.MAIN, "discord-RPC", "Displays NF Client as your presence on Discord.");
+
+        runInMainMenu = true;
+    }
+
     private static final RichPresence rpc = new RichPresence();
     private int ticks;
     private boolean forceUpdate, lastWasInMainMenu;
@@ -104,18 +112,16 @@ public class DiscordRPC extends Module {
     private final List<Script> line2Scripts = new ArrayList<>();
     private int line2Ticks, line2I;
 
-    public DiscordRPC() {
-        super(NetherFreedom.MAIN, "discord-RPC", "Displays NF Client as your presence on Discord. You can use starscript {} see doc down below");
-        runInMainMenu = true;
-    }
 
     @Override
     public void onActivate() {
+        checkRPC();
+
         DiscordIPC.start(991850994294079621L, null);
 
         rpc.setStart(System.currentTimeMillis() / 1000L);
 
-        String largeText = "Nether Freedom Client";
+        String largeText = "NFClient";
         rpc.setLargeImage("netherfreedom", largeText);
 
         recompileLine1();
@@ -128,6 +134,12 @@ public class DiscordRPC extends Module {
 
         line1I = 0;
         line2I = 0;
+    }
+
+    public void checkRPC() {
+        DiscordPresence presence = Modules.get().get(DiscordPresence.class);
+        if (presence == null) return;
+        if (presence.isActive()) presence.toggle();
     }
 
     @Override
@@ -186,7 +198,7 @@ public class DiscordRPC extends Module {
                     }
 
                     try {
-                        rpc.setDetails(MeteorStarscript.ss.run(line1Scripts.get(i)));
+                        rpc.setDetails(MeteorStarscript.ss.run(line1Scripts.get(i)).toString());
                     } catch (StarscriptError e) {
                         ChatUtils.error("Starscript", e.getMessage());
                     }
@@ -206,7 +218,7 @@ public class DiscordRPC extends Module {
                     }
 
                     try {
-                        rpc.setState(MeteorStarscript.ss.run(line2Scripts.get(i)));
+                        rpc.setState(MeteorStarscript.ss.run(line2Scripts.get(i)).toString());
                     } catch (StarscriptError e) {
                         ChatUtils.error("Starscript", e.getMessage());
                     }
@@ -220,12 +232,11 @@ public class DiscordRPC extends Module {
             if (!lastWasInMainMenu) {
                 rpc.setDetails("NF Client " + NetherFreedom.VERSION);
 
-                if (mc.currentScreen instanceof TitleScreen) rpc.setState("Looking at title screen");
+                if (mc.currentScreen instanceof TitleScreen) rpc.setState("In main menu");
                 else if (mc.currentScreen instanceof SelectWorldScreen) rpc.setState("Selecting world");
                 else if (mc.currentScreen instanceof CreateWorldScreen || mc.currentScreen instanceof EditGameRulesScreen) rpc.setState("Creating world");
                 else if (mc.currentScreen instanceof EditWorldScreen) rpc.setState("Editing world");
                 else if (mc.currentScreen instanceof LevelLoadingScreen) rpc.setState("Loading world");
-                //else if (mc.currentScreen instanceof SaveLevelScreen) rpc.setState("Saving world");
                 else if (mc.currentScreen instanceof MultiplayerScreen) rpc.setState("Selecting server");
                 else if (mc.currentScreen instanceof AddServerScreen) rpc.setState("Adding server");
                 else if (mc.currentScreen instanceof ConnectScreen || mc.currentScreen instanceof DirectConnectScreen) rpc.setState("Connecting to server");
@@ -258,9 +269,10 @@ public class DiscordRPC extends Module {
 
     @Override
     public WWidget getWidget(GuiTheme theme) {
-        WButton help = theme.button("Open documentation.");
-        help.action = () -> Util.getOperatingSystem().open("https://github.com/MeteorDevelopment/meteor-client/wiki/Starscript");
+        WHorizontalList buttons = theme.horizontalList();
+        WButton meteor = buttons.add(theme.button("Meteor Placeholders")).widget();
 
-        return help;
+        meteor.action = () -> Util.getOperatingSystem().open("https://github.com/MeteorDevelopment/meteor-client/wiki/Starscript");
+        return buttons;
     }
 }

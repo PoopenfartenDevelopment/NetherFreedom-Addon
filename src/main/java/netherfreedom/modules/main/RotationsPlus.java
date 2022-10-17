@@ -89,18 +89,20 @@ public class RotationsPlus extends Module {
         }
 
         if (arrowSnap.get()) {
+            if (!Input.isKeyPressed(GLFW.GLFW_KEY_LEFT)) lDown = false;
+
             if (Input.isKeyPressed(GLFW.GLFW_KEY_LEFT) && !lDown) {
                 mc.player.setYaw(mc.player.getYaw() - 45);
                 lDown = true;
-            } else if (!Input.isKeyPressed (GLFW.GLFW_KEY_LEFT)) {
-                lDown = false;
+                return;
             }
+
+            if (!Input.isKeyPressed(GLFW.GLFW_KEY_RIGHT)) rDown = false;
 
             if (Input.isKeyPressed(GLFW.GLFW_KEY_RIGHT) && !rDown) {
                 mc.player.setYaw(mc.player.getYaw() + 45);
-                lDown = true;
-            } else if (!Input.isKeyPressed (GLFW.GLFW_KEY_RIGHT)) {
-                lDown = false;
+                rDown = true;
+                return;
             }
         }
     }

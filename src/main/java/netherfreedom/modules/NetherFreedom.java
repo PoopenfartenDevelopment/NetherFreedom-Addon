@@ -10,7 +10,8 @@ import netherfreedom.utils.ServiceLoader;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.systems.Systems;
-import meteordevelopment.meteorclient.systems.hud.HUD;
+import meteordevelopment.meteorclient.systems.hud.Hud;
+import meteordevelopment.meteorclient.systems.hud.HudGroup;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.commands.Commands;
@@ -23,9 +24,10 @@ import java.lang.invoke.MethodHandles;
 import static netherfreedom.AdapterKt.*;
 
 public class NetherFreedom extends MeteorAddon {
+    public static String VERSION = "1.1";
 	public static final Logger LOG = LoggerFactory.getLogger("NF Client");
-    public static final String VERSION = "1.0";
     public static final Category MAIN = new Category("NF Client", Items.NETHERITE_PICKAXE.getDefaultStack());
+    public static final HudGroup HUD = new HudGroup("NF Client");
 
 	@Override
 	public void onInitialize() {
@@ -45,39 +47,35 @@ public class NetherFreedom extends MeteorAddon {
         modules.add(new AfkLogout());
         modules.add(new ArmorNotify());
         modules.add(new Aura());
-        modules.add(new AutoDisable());
+        modules.add(new AutoWalkPlus());
         modules.add(new ChatTweaks());
         modules.add(new DiggingTools());
         modules.add(new DiscordRPC());
         modules.add(new HandManager());
         modules.add(new RotationsPlus());
-        modules.add(new Strafe());
-        modules.add(new TPSSync());
         // Main (Kotlin)
-        modules.add(new NetherBorer());
         modules.add(new InvManager());
+        modules.add(new NetherBorer());
         modules.add(new NoCaveCulling());
-        modules.add(AutoEat.INSTANCE);
+        modules.add(AutoEatPlus.INSTANCE);
         modules.add(ScaffoldPlus.INSTANCE);
 
         // Commands
         Commands commands = Commands.get();
-        commands.add(new ClearChat());
         commands.add(new Disconnect());
-        commands.add(new ToggleAll());
+        commands.add(new ToggleModules());
 
         // HUD
-        HUD hud = Systems.get(HUD.class);
-        hud.elements.add(new BaritoneHud(hud));
-        hud.elements.add(new BindsHud(hud));
-        hud.elements.add(new EchestHud(hud));
-        hud.elements.add(new GapHud(hud));
-        hud.elements.add(new NFWelcomeHud(hud));
-        hud.elements.add(new ObbyHud(hud));
-        hud.elements.add(new PickHud(hud));
-        hud.elements.add(new SpotifyHud(hud));
-        hud.elements.add(new XpHud(hud));
+        Hud hud = Systems.get(Hud.class);
+        hud.register(BindsHud.INFO);
+        hud.register(NFWelcomeHud.INFO);
+        hud.register(SpotifyHud.INFO);
 	}
+
+    @Override
+    public String getPackage() {
+        return "netherfreedom";
+    }
 
     @Override
     public void onRegisterCategories() {

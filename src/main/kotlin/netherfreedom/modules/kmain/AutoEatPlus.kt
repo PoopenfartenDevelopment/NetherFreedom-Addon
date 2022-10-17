@@ -2,6 +2,7 @@ package netherfreedom.modules.kmain
 
 import netherfreedom.*
 import netherfreedom.modules.NetherFreedom
+import netherfreedom.modules.kmain.ScaffoldPlus
 import meteordevelopment.meteorclient.events.packets.PacketEvent
 import meteordevelopment.meteorclient.events.world.TickEvent
 import meteordevelopment.meteorclient.utils.player.InvUtils
@@ -13,10 +14,10 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
 import net.minecraft.util.Hand
 import net.minecraft.util.math.Direction.DOWN
 
-object AutoEat:MeteorModule(NetherFreedom.MAIN, "Auto Eat", "Automatically eats the chosen food.") {
+object AutoEatPlus:MeteorModule(NetherFreedom.MAIN, "AutoEat+", "Automatically eats the chosen food.") {
 
     private var hunger by mainGroup.add(IValue("Hunger", 16, "Hunger to eat at.", 1..19, 1))
-    private val autoGap by mainGroup.add(BValue("AutoGap", false, "Gap when no fire resistance effect."))
+    private val autoGap by mainGroup.add(BValue("AutoGap", true, "Gap when no fire resistance effect."))
     private val offhand by mainGroup.add(BValue("Offhand", true, "Eat if food is in offhand."))
     var eating = false
     private var slot = 0
@@ -97,9 +98,7 @@ object AutoEat:MeteorModule(NetherFreedom.MAIN, "Auto Eat", "Automatically eats 
 
     private fun doEat(offhand:Boolean) {
         mc.options.useKey.isPressed = true
-        if (!mc.player!!.isUsingItem) mc.interactionManager!!.interactItem(mc.player,
-                                                                           mc.world,
-                                                                           if (offhand) Hand.OFF_HAND else Hand.MAIN_HAND)
+        if (!mc.player!!.isUsingItem) mc.interactionManager!!.interactItem(mc.player, if (offhand) Hand.OFF_HAND else Hand.MAIN_HAND)
         eating = true
     }
 
