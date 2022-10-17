@@ -39,8 +39,8 @@ public class ToggleModules extends Command {
                 modules.get(InvManager.class).toggle();
             if (modules.get(LiquidFiller.class).isActive())
                 modules.get(LiquidFiller.class).toggle();
-            if (modules.get(NetherBorer.class).isActive())
-                modules.get(NetherBorer.class).toggle();
+            if (modules.get(NFNuker.class).isActive())
+                modules.get(NFNuker.class).toggle();
             if (modules.get(Rotation.class).isActive())
                 modules.get(Rotation.class).toggle();
             if (modules.get(SafeWalk.class).isActive())

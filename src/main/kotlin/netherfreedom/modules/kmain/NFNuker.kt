@@ -11,18 +11,11 @@ import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
 import kotlin.math.floor
 
-class NetherBorer:MeteorModule(NetherFreedom.MAIN, "Nether Borer", "Automatically digs netherrack.") {
+class NFNuker:MeteorModule(NetherFreedom.MAIN, "NFNuker", "Custom nuker specifically made for the Nether Freedom project.") {
 
     private val general = settings.defaultGroup
 
-    private var mode by general.add(EValue("Mode", Mode.NORMAL, "Mode to use"))
-    private var extForward by general.add(IValue("ExtForward", 4, "How many blocks to extend forward", 1..6, 1))
-    private var extBackward by general.add(IValue("ExtBackward", 4, "How many blocks to extend backward", 1..6, 1))
-    private var xOffset by general.add(IValue("XOffset", 0, "How many blocks to offset the y axis", -2..2, 1))
-    private var zOffset by general.add(IValue("ZOffset", 0, "How many blocks to offset the z axis", -2..2, 1))
     private var keepY by general.add(IValue("KeepY", 120, "Keeps a specific Y level when digging", -1..255, 1))
-    private var disable by general.add(BValue("Disable", false, "Disable the jumping block feature"))
-    private var jumping by general.add(BValue("Jumping", false, "Send more or less packs"))
 
     // preserve 2 block tall tunnel for speed bypass
     private var blacklist:MutableList<BlockPos> = ArrayList()
@@ -58,35 +51,15 @@ class NetherBorer:MeteorModule(NetherFreedom.MAIN, "Nether Borer", "Automaticall
                                   floor(mc.player!!.z).toInt())
         if (this.playerPos != this.prevBlockPos || Util.getMeasuringTimeMs() - this.lastUpdateTime > 800) {
             this.getBlacklistedBlockPoses()
-            when (this.mode) {
-                Mode.THIN -> {
-                    this.do2x3(playerPos.add(xOffset, 0, zOffset))
-                    if (jumping) {
-                        this.do2x3(playerPos.add(xOffset * -1, 0, zOffset * -1))
-                        this.do2x3(playerPos.add(xOffset * -3, 0, zOffset * -3))
-                        this.do2x3(playerPos.add(xOffset * -7, 0, zOffset * -7))
-                    } else {
-                        this.do2x3(playerPos.add(xOffset * -3, 0, zOffset * -3))
-                    }
-                }
-                Mode.NORMAL -> {
-                    this.doHighway4(playerPos.add(xOffset, 0, zOffset))
-                    if (jumping) {
-                        this.doHighway4(playerPos.add(xOffset * -1, 0, zOffset * -1))
-                        this.doHighway4(playerPos.add(xOffset * -3, 0, zOffset * -3))
-                        this.doHighway4(playerPos.add(xOffset * -7, 0, zOffset * -7))
-                    } else {
-                        this.doHighway4(playerPos.add(xOffset * -3, 0, zOffset * -3))
-                    }
-                }
-            }
+            this.doMine(playerPos.add(0, 0, 0))
+            this.doMine(playerPos.add(0 * -3, 0, 0 * -3))
             this.lastUpdateTime = Util.getMeasuringTimeMs()
         }
         packets = 0
     }
 
-    private fun doHighway4(plyerPos:BlockPos = playerPos) {
-        for (i in -extBackward..extForward) {
+    private fun doMine(plyerPos:BlockPos = playerPos) {
+        for (i in -4..4) {
             this.breakBlock(plyerPos.forward(i))
             this.breakBlock(plyerPos.forward(i).up())
             this.breakBlock(plyerPos.forward(i).up(2))
@@ -118,17 +91,6 @@ class NetherBorer:MeteorModule(NetherFreedom.MAIN, "Nether Borer", "Automaticall
         }
     }
 
-    private fun do2x3(plyerPos:BlockPos = playerPos) {
-        for (i in -extBackward..extForward) {
-            this.breakBlock(plyerPos.forward(i))
-            this.breakBlock(plyerPos.forward(i).up())
-            this.breakBlock(plyerPos.forward(i).up(2))
-            this.breakBlock(plyerPos.forward(i).left(1))
-            this.breakBlock(plyerPos.forward(i).left(1).up())
-            this.breakBlock(plyerPos.forward(i).left(1).up(2))
-        }
-    }
-
     private fun getBlacklistedBlockPoses() {
         this.blacklist.clear()
         if (highway in 1..4) {
@@ -155,7 +117,8 @@ class NetherBorer:MeteorModule(NetherFreedom.MAIN, "Nether Borer", "Automaticall
 
     private fun breakBlock(blockPos:BlockPos) {
         if (packets >= 130) return
-        if (mc.world!!.getBlockState(blockPos).material.isReplaceable || (this.blacklist.contains(blockPos) && disable)) return
+        if (mc.world!!.getBlockState(blockPos).material.isReplaceable) return
+        if (mc.world!!.getBlockState(blockPos).block.hardness >= 50) return
         mc.networkHandler!!.sendPacket(PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK,
                                                              blockPos,
                                                              Direction.UP))
@@ -164,9 +127,4 @@ class NetherBorer:MeteorModule(NetherFreedom.MAIN, "Nether Borer", "Automaticall
                                                              Direction.UP))
         packets += 2
     }
-
-    enum class Mode {
-        THIN, NORMAL
-    }
-
 }

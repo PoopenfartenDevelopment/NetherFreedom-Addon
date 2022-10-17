@@ -55,8 +55,8 @@ public class NetherFreedom extends MeteorAddon {
         modules.add(new RotationsPlus());
         // Main (Kotlin)
         modules.add(new InvManager());
-        modules.add(new NetherBorer());
         modules.add(new NoCaveCulling());
+        modules.add(new NFNuker());
         modules.add(AutoEatPlus.INSTANCE);
         modules.add(ScaffoldPlus.INSTANCE);
 
