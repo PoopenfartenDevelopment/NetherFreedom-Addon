@@ -48,6 +48,7 @@ public class NetherFreedom extends MeteorAddon {
         modules.add(new ArmorNotify());
         modules.add(new Aura());
         modules.add(new AutoWalkPlus());
+        modules.add(new BaritoneTest());
         modules.add(new ChatTweaks());
         modules.add(new DiggingTools());
         modules.add(new DiscordRPC());
