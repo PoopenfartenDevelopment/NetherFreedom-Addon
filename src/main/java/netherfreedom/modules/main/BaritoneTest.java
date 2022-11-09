@@ -7,11 +7,14 @@ import baritone.api.pathing.goals.GoalBlock;
 import baritone.api.process.ICustomGoalProcess;
 import baritone.api.process.IMineProcess;
 import meteordevelopment.meteorclient.MeteorClient;
+import meteordevelopment.meteorclient.events.render.Render3DEvent;
+import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.world.LiquidFiller;
+import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.text.Text;
@@ -81,6 +84,13 @@ public class BaritoneTest extends Module {
             .build()
     );
 
+    private final Setting<Boolean> renderCorners = sgGeneral.add(new BoolSetting.Builder()
+            .name("renderCorners")
+            .description("renders the 2 corners")
+            .defaultValue(true)
+            .build()
+    );
+
     private final Setting<Boolean> debug = sgGeneral.add(new BoolSetting.Builder()
             .name("debug")
             .description("don't use this")
@@ -91,7 +101,7 @@ public class BaritoneTest extends Module {
     public BaritoneTest() {super(NetherFreedom.MAIN, "Baritone miner", "mines shit");}
     //ask carlos for the y pos
     public BlockPos cornerOne, cornerTwo;
-    private BlockPos iterativePos;
+    private BlockPos iterativePos, endOfLine;
     Modules modules = Modules.get();
 
 
@@ -101,8 +111,11 @@ public class BaritoneTest extends Module {
         cornerTwo = new BlockPos(corner2X.get(), yLevel.get(), corner2Z.get());
 
         //heading to the starting position
-        info("cornerOne: " + cornerOne);
-        info("cornerTwo: " + cornerTwo);
+        if (debug.get()){
+            info("cornerOne: " + cornerOne);
+            info("cornerTwo: " + cornerTwo);
+
+        }
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(cornerOne));
 
         baritoneSettings.blockPlacementPenalty.value = 0.5;
@@ -116,17 +129,39 @@ public class BaritoneTest extends Module {
     }
 
     @EventHandler
+    private void onRender(Render3DEvent event){
+        Color color1 = new Color(255, 0, 0, 75);
+        Color color2 = new Color(255, 0, 0, 255);
+        if(renderCorners.get()){
+            event.renderer.box(cornerOne.add(0,1,0),color1,color2, ShapeMode.Both,0);
+            event.renderer.box(cornerTwo.add(0,1,0),color1,color2, ShapeMode.Both,0);
+        }
+    }
+
+
+    @EventHandler
     public void onTick(){
         BlockPos currPlayerPos = mc.player.getBlockPos();
+        int nukerOffset = nukerRange.get() > 0 ? nukerRange.get() *2: -nukerRange.get()*2;
         //checks if the starting position has been reached and turns on the necessary modules
 
         if(cornerOne == currPlayerPos) {
             activateDiggingModules();
         }
 
-        BlockPos endOfLine = new BlockPos(cornerOne.getX(),yLevel.get(),cornerTwo.getZ());
-        baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(endOfLine));
+        endOfLine = new BlockPos(cornerOne.getX(),yLevel.get(),cornerTwo.getZ());
+        iterativePos = new BlockPos(endOfLine.add(0,0,nukerOffset));
 
+        if (!endOfLine.equals(currPlayerPos)){
+            baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(endOfLine));
+        }
+        else {
+            baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(iterativePos));
+        }
+
+        if(currPlayerPos.equals(iterativePos)){
+            endOfLine = new BlockPos(cornerOne.getX(),yLevel.get(),iterativePos.getZ());
+        }
     }
 
     private void activateDiggingModules (){
