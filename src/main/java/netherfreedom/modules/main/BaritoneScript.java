@@ -4,28 +4,21 @@ import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
 import baritone.api.Settings;
 import baritone.api.pathing.goals.GoalBlock;
-import baritone.api.process.ICustomGoalProcess;
-import baritone.api.process.IMineProcess;
-import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
-import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.world.LiquidFiller;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Block;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import netherfreedom.modules.NetherFreedom;
 import netherfreedom.modules.kmain.NFNuker;
 
 
-public class BaritoneTest extends Module {
+public class BaritoneScript extends Module {
 
     private final IBaritone baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
     private final Settings baritoneSettings = BaritoneAPI.getSettings();
@@ -106,7 +99,7 @@ public class BaritoneTest extends Module {
             .build()
     );
 
-    public BaritoneTest() {super(NetherFreedom.MAIN, "Baritone miner", "mines shit");}
+    public BaritoneScript() {super(NetherFreedom.MAIN, "Baritone miner", "mines shit");}
     //ask carlos for the y pos
     public BlockPos cornerOne, cornerTwo, cornerThree, cornerFour;
     private BlockPos iterativePos, endOfLine;
