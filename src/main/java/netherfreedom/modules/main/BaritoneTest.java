@@ -33,11 +33,12 @@ public class BaritoneTest extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     public enum debugs{
-        none,
+        None,
         baritonePathing,
         whatItDO
     }
 
+    //todo: find a better fucking way to get coords as settings
     private final Setting<Integer> corner1X = sgGeneral.add(new IntSetting.Builder()
             .name("corner1X")
             .description("the first corner of the square where it will mine")
@@ -101,13 +102,13 @@ public class BaritoneTest extends Module {
     private final Setting<debugs> debug = sgGeneral.add(new EnumSetting.Builder<debugs>()
             .name("debug")
             .description("don't use this")
-            .defaultValue(debugs.none)
+            .defaultValue(debugs.None)
             .build()
     );
 
     public BaritoneTest() {super(NetherFreedom.MAIN, "Baritone miner", "mines shit");}
     //ask carlos for the y pos
-    public BlockPos cornerOne, cornerTwo;
+    public BlockPos cornerOne, cornerTwo, cornerThree, cornerFour;
     private BlockPos iterativePos, endOfLine;
     private boolean startPosReached = false;
     Modules modules = Modules.get();
@@ -115,11 +116,15 @@ public class BaritoneTest extends Module {
 
     @Override
     public void onActivate(){
+        //Bro this shit looks so fucking scuffed
+        //todo: make this shit make more sense
         cornerOne = new BlockPos(corner1X.get(), yLevel.get(), corner1Z.get());
         cornerTwo = new BlockPos(corner2X.get(), yLevel.get(), corner2Z.get());
+        cornerThree = new BlockPos(cornerOne.getX(), yLevel.get(), cornerTwo.getZ());
+        cornerFour = new BlockPos(cornerTwo.getX(), yLevel.get(), cornerOne.getZ());
 
         //heading to the starting position
-        if (!debug.get().equals(debugs.none)){
+        if (!debug.get().equals(debugs.None)){
             info("cornerOne: " + cornerOne);
             info("cornerTwo: " + cornerTwo);
 
@@ -144,6 +149,7 @@ public class BaritoneTest extends Module {
         if(renderCorners.get()){
             event.renderer.box(cornerOne,color1,color2, ShapeMode.Both,0);
             event.renderer.box(cornerTwo,color1,color2, ShapeMode.Both,0);
+
         }
     }
 
@@ -155,7 +161,8 @@ public class BaritoneTest extends Module {
         //checks if the starting position has been reached and turns on the necessary modules
 
        if(debug.get().equals(debugs.baritonePathing)){
-           info(baritone.getCustomGoalProcess().getGoal().toString());
+           String currGoal = String.valueOf(baritone.getCustomGoalProcess().getGoal());
+           if(currGoal != null) info(currGoal);
        }
 
         if(cornerOne == currPlayerPos) {
