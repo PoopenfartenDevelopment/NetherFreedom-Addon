@@ -8,6 +8,7 @@ import baritone.api.process.ICustomGoalProcess;
 import baritone.api.process.IMineProcess;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
+import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Category;
@@ -17,6 +18,7 @@ import meteordevelopment.meteorclient.systems.modules.world.LiquidFiller;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import netherfreedom.modules.NetherFreedom;
@@ -29,6 +31,12 @@ public class BaritoneTest extends Module {
     private final Settings baritoneSettings = BaritoneAPI.getSettings();
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
+
+    public enum debugs{
+        none,
+        baritonePathing,
+        whatItDO
+    }
 
     private final Setting<Integer> corner1X = sgGeneral.add(new IntSetting.Builder()
             .name("corner1X")
@@ -48,7 +56,6 @@ public class BaritoneTest extends Module {
             .sliderRange(-29999983, 29999983)
             .build()
     );
-
     private final Setting<Integer> corner2X = sgGeneral.add(new IntSetting.Builder()
             .name("corner2X")
             .description("the second corner of the square where it will mine")
@@ -91,10 +98,10 @@ public class BaritoneTest extends Module {
             .build()
     );
 
-    private final Setting<Boolean> debug = sgGeneral.add(new BoolSetting.Builder()
+    private final Setting<debugs> debug = sgGeneral.add(new EnumSetting.Builder<debugs>()
             .name("debug")
             .description("don't use this")
-            .defaultValue(true)
+            .defaultValue(debugs.none)
             .build()
     );
 
@@ -102,6 +109,7 @@ public class BaritoneTest extends Module {
     //ask carlos for the y pos
     public BlockPos cornerOne, cornerTwo;
     private BlockPos iterativePos, endOfLine;
+    private boolean startPosReached = false;
     Modules modules = Modules.get();
 
 
@@ -111,12 +119,12 @@ public class BaritoneTest extends Module {
         cornerTwo = new BlockPos(corner2X.get(), yLevel.get(), corner2Z.get());
 
         //heading to the starting position
-        if (debug.get()){
+        if (!debug.get().equals(debugs.none)){
             info("cornerOne: " + cornerOne);
             info("cornerTwo: " + cornerTwo);
 
         }
-        baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(cornerOne));
+        setGoal(cornerOne);
 
         baritoneSettings.blockPlacementPenalty.value = 0.5;
         baritoneSettings.allowPlace.value = false;
@@ -125,7 +133,8 @@ public class BaritoneTest extends Module {
     @Override
     public void onDeactivate(){
         baritone.getPathingBehavior().cancelEverything();
-
+        iterativePos = null;
+        endOfLine = null;
     }
 
     @EventHandler
@@ -133,37 +142,45 @@ public class BaritoneTest extends Module {
         Color color1 = new Color(255, 0, 0, 75);
         Color color2 = new Color(255, 0, 0, 255);
         if(renderCorners.get()){
-            event.renderer.box(cornerOne.add(0,1,0),color1,color2, ShapeMode.Both,0);
-            event.renderer.box(cornerTwo.add(0,1,0),color1,color2, ShapeMode.Both,0);
+            event.renderer.box(cornerOne,color1,color2, ShapeMode.Both,0);
+            event.renderer.box(cornerTwo,color1,color2, ShapeMode.Both,0);
         }
     }
 
 
     @EventHandler
-    public void onTick(){
+    public void onTick(TickEvent.Pre event){
         BlockPos currPlayerPos = mc.player.getBlockPos();
         int nukerOffset = nukerRange.get() > 0 ? nukerRange.get() *2: -nukerRange.get()*2;
         //checks if the starting position has been reached and turns on the necessary modules
 
+       if(debug.get().equals(debugs.baritonePathing)){
+           info(baritone.getCustomGoalProcess().getGoal().toString());
+       }
+
         if(cornerOne == currPlayerPos) {
+            startPosReached = true;
             activateDiggingModules();
         }
 
         endOfLine = new BlockPos(cornerOne.getX(),yLevel.get(),cornerTwo.getZ());
         iterativePos = new BlockPos(endOfLine.add(0,0,nukerOffset));
 
-        if (!endOfLine.equals(currPlayerPos)){
-            baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(endOfLine));
+        if (!endOfLine.equals(currPlayerPos) && startPosReached){
+            setGoal(endOfLine);
+        } else if (endOfLine.equals(currPlayerPos) && startPosReached) {
+            setGoal(iterativePos);
         }
-        else {
-            baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(iterativePos));
-        }
+
 
         if(currPlayerPos.equals(iterativePos)){
             endOfLine = new BlockPos(cornerOne.getX(),yLevel.get(),iterativePos.getZ());
         }
     }
 
+    private void setGoal(BlockPos goal){
+        baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(goal));
+    }
     private void activateDiggingModules (){
         if (modules.get(LiquidFiller.class).isActive())
             modules.get(LiquidFiller.class).toggle();
