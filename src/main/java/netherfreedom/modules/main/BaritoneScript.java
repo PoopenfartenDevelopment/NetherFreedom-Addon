@@ -123,9 +123,10 @@ public class BaritoneScript extends Module {
 
         }
         setGoal(cornerOne);
+        endOfLine = new BlockPos(cornerOne.getX(),yLevel.get(),cornerTwo.getZ());
 
-        baritoneSettings.blockPlacementPenalty.value = 0.5;
-        baritoneSettings.allowPlace.value = false;
+        baritoneSettings.blockPlacementPenalty.value = 0.0;
+        baritoneSettings.allowPlace.value = true;
     }
 
     @Override
@@ -142,7 +143,8 @@ public class BaritoneScript extends Module {
         if(renderCorners.get()){
             event.renderer.box(cornerOne,color1,color2, ShapeMode.Both,0);
             event.renderer.box(cornerTwo,color1,color2, ShapeMode.Both,0);
-
+            event.renderer.box(cornerThree,color1,color2,ShapeMode.Both,0)
+            event.renderer.box(cornerFour,color1,color2,ShapeMode.Both,0)
         }
     }
 
@@ -151,27 +153,25 @@ public class BaritoneScript extends Module {
     public void onTick(TickEvent.Pre event){
         BlockPos currPlayerPos = mc.player.getBlockPos();
         int nukerOffset = nukerRange.get() > 0 ? nukerRange.get() *2: -nukerRange.get()*2;
-        //checks if the starting position has been reached and turns on the necessary modules
+
+        iterativePos = new BlockPos(endOfLine.add(0,0,nukerOffset));
 
        if(debug.get().equals(debugs.baritonePathing)){
            String currGoal = String.valueOf(baritone.getCustomGoalProcess().getGoal());
            if(currGoal != null) info(currGoal);
        }
 
-        if(cornerOne == currPlayerPos) {
+        //checks if the starting position has been reached and turns on the necessary modules
+        if(cornerOne.equals(currPlayerPos)) {
             startPosReached = true;
             activateDiggingModules();
         }
-
-        endOfLine = new BlockPos(cornerOne.getX(),yLevel.get(),cornerTwo.getZ());
-        iterativePos = new BlockPos(endOfLine.add(0,0,nukerOffset));
 
         if (!endOfLine.equals(currPlayerPos) && startPosReached){
             setGoal(endOfLine);
         } else if (endOfLine.equals(currPlayerPos) && startPosReached) {
             setGoal(iterativePos);
         }
-
 
         if(currPlayerPos.equals(iterativePos)){
             endOfLine = new BlockPos(cornerOne.getX(),yLevel.get(),iterativePos.getZ());
@@ -181,10 +181,11 @@ public class BaritoneScript extends Module {
     private void setGoal(BlockPos goal){
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(goal));
     }
+
     private void activateDiggingModules (){
-        if (modules.get(LiquidFiller.class).isActive())
+        if (!modules.get(LiquidFiller.class).isActive())
             modules.get(LiquidFiller.class).toggle();
-        if (modules.get(NFNuker.class).isActive())
+        if (!modules.get(NFNuker.class).isActive())
             modules.get(NFNuker.class).toggle();
     }
 
