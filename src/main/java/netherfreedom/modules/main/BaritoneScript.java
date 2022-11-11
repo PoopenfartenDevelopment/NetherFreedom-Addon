@@ -174,7 +174,6 @@ public class BaritoneScript extends Module {
             if(currPlayerPos.equals(offsetStart)){
                 reachedEndOfLIne = false;
                 setGoal(iterativePos.offset(findBlockDir(iterativePos,cornerOne)));
-
             }
         }
 
