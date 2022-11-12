@@ -13,12 +13,12 @@ import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.world.LiquidFiller;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import netherfreedom.modules.NetherFreedom;
 import netherfreedom.modules.kmain.NFNuker;
-
-
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 
 public class BaritoneScript extends Module {
@@ -106,10 +106,10 @@ public class BaritoneScript extends Module {
     public BaritoneScript() {super(NetherFreedom.MAIN, "Baritone miner", "mines shit");}
     //ask carlos for the y pos
     public BlockPos cornerOne, cornerTwo, cornerThree, cornerFour;
-    private BlockPos iterativePos;
-    private boolean startPosReached, reachedEndOfLIne = false;
-    int ran = 0;
-    Direction dirToGoal;
+    private BlockPos currGoal, barPos, offsetPos;
+    private  Boolean offsetting = false;
+    int ran,dist = 0;
+    Direction dirToOpposite, goalDir;
 
     @Override
     public void onActivate(){
@@ -120,21 +120,30 @@ public class BaritoneScript extends Module {
         cornerThree = new BlockPos(cornerOne.getX(), yLevel.get(), cornerTwo.getZ());
         cornerFour = new BlockPos(cornerTwo.getX(), yLevel.get(), cornerOne.getZ());
 
-         dirToGoal = findBlockDir(cornerOne,cornerTwo);
 
-        setGoal(cornerOne);
+		currGoal = cornerThree;
+        barPos = cornerOne;
 
-        baritoneSettings.blockPlacementPenalty.value = 0.5;
+        baritoneSettings.blockPlacementPenalty.value = 20.0;
         baritoneSettings.allowPlace.value = false;
+    }
+
+    @EventHandler
+    public void onDisconnect(){
+        if (modules.get(BaritoneScript.class).isActive()){
+            toggle();
+        }
     }
 
     @Override
     public void onDeactivate(){
         baritone.getPathingBehavior().cancelEverything();
-        iterativePos = null;
-        dirToGoal = null;
-        startPosReached = false;
+        dirToOpposite = null;
+		barPos = null;
+		currGoal = null;
+        offsetting = false;
         ran = 0;
+        dist = 0;
     }
 
     @EventHandler
@@ -145,7 +154,7 @@ public class BaritoneScript extends Module {
                 event.renderer.box(cornerTwo,Color.RED,Color.RED, ShapeMode.Both,0);
                 event.renderer.box(cornerThree,Color.GREEN,Color.GREEN, ShapeMode.Both,0);
                 event.renderer.box(cornerFour,Color.GREEN,Color.GREEN, ShapeMode.Both,0);
-                event.renderer.box(iterativePos,Color.BLUE,Color.BLUE, ShapeMode.Both,0);
+                event.renderer.box(currGoal,Color.BLUE,Color.BLUE, ShapeMode.Both,0);
             }catch(Exception ignored){
             }
         }
@@ -157,49 +166,78 @@ public class BaritoneScript extends Module {
         BlockPos currPlayerPos = mc.player.getBlockPos();
         int nukerOffset = nukerRange.get() * 2;
 
-        //checks if the starting position has been reached and turns on the necessary modules
-        if(cornerOne.equals(currPlayerPos)) {
-            startPosReached = true;
+        if(currPlayerPos.equals(cornerOne)){
+            goalDir = findBlockDir(currPlayerPos,currGoal);
+            dist = findDistance(currPlayerPos,currGoal,goalDir);
+            info(String.valueOf(currGoal));
             activateDiggingModules();
-            iterativePos = cornerThree;
-            setGoal(iterativePos);
-            if(debug.get() != debugs.None) info("activated digging modules and startpos reached");
         }
 
-        if(currPlayerPos.equals(iterativePos)) reachedEndOfLIne = true;
-
-        if(startPosReached && reachedEndOfLIne){
-            BlockPos offsetStart = moveUpLine(iterativePos,nukerOffset);
-            setGoal(offsetStart);
-            if(currPlayerPos.equals(offsetStart)){
-                reachedEndOfLIne = false;
-                setGoal(iterativePos.offset(findBlockDir(iterativePos,cornerOne)));
+        if(!currPlayerPos.equals(barPos) && !offsetting ){
+            try{
+                setGoal(barPos);
+            } catch(Exception e){
+                String stacktrace = ExceptionUtils.getStackTrace(e);
+                info(stacktrace);
             }
         }
 
+        if (currPlayerPos.equals(barPos)){
+            barPos = new BlockPos(currPlayerPos.offset(goalDir,3));
 
-        if(startPosReached){
-            setGoal(iterativePos);
         }
 
+        if (currPlayerPos.equals(currGoal)){
+            info("reached end of line");
+            offsetPos = moveUpLine(currGoal,nukerOffset);
+            setGoal(offsetPos);
+            offsetting = true;
+        }
 
+        if(currPlayerPos.equals(offsetPos)){
+            info("offsetting");
+            try{
+                currGoal = new BlockPos(offsetPos.offset(goalDir.getOpposite(),dist));
+                info(String.valueOf(currGoal));
+                goalDir = goalDir.getOpposite();
+            }catch (Exception e){
+                String stacktrace = ExceptionUtils.getStackTrace(e);
+                info(stacktrace);
+            }
+            info(String.valueOf(currGoal));
+            barPos = offsetPos;
+            offsetting = false;
+            offsetPos = null;
+        }
     }
 
-    private BlockPos moveUpLine(BlockPos currPos, int nukerOffset){
-        return new BlockPos(currPos.offset(dirToGoal,nukerOffset));
+    private BlockPos moveUpLine(BlockPos Pos, int nukerOffset){
+        dirToOpposite= findBlockDir(cornerThree,cornerTwo);
+        return new BlockPos(Pos.offset(dirToOpposite,nukerOffset));
     }
 
-    private Direction findBlockDir(BlockPos originBlock , BlockPos goalBlock) {
-        BlockPos vec = new BlockPos(goalBlock.getX() - originBlock.getX(),0, goalBlock.getZ() - originBlock.getZ());
-        Direction dir = Direction.fromVector((int) Math.signum(vec.getX()),0, (int) Math.signum(vec.getY()));
-        info(String.valueOf(dir));
+    private int findDistance(BlockPos pos1, BlockPos pos2, Direction dir){
+        int dist = 0;
+        switch(dir){
+            case EAST:
+            case WEST:
+                dist = Math.abs(pos1.getX() - pos2.getX());
+            case SOUTH:
+            case NORTH:
+                dist = Math.abs(pos1.getZ() - pos2.getZ());
+        }
+        return dist;
+    }
+
+    private Direction findBlockDir(BlockPos originBlock, BlockPos goalBlock) {
+        BlockPos vec = new BlockPos(Math.signum(goalBlock.getX() - originBlock.getX()),0, Math.signum(goalBlock.getZ() - originBlock.getZ()));
+        Direction dir = Direction.fromVector(vec);
         return dir;
     }
 
     private void setGoal(BlockPos goal){
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(goal));
     }
-
 
     private void activateDiggingModules (){
         if (!modules.get(LiquidFiller.class).isActive())

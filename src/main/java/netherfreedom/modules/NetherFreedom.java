@@ -24,7 +24,7 @@ import java.lang.invoke.MethodHandles;
 import static netherfreedom.AdapterKt.*;
 
 public class NetherFreedom extends MeteorAddon {
-    public static String VERSION = "1.1";
+    public static String VERSION = "1.2";
 	public static final Logger LOG = LoggerFactory.getLogger("NF Client");
     public static final Category MAIN = new Category("NF Client", Items.NETHERITE_PICKAXE.getDefaultStack());
     public static final HudGroup HUD = new HudGroup("NF Client");
