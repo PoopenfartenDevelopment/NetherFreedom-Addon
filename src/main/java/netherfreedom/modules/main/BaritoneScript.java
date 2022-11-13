@@ -104,7 +104,6 @@ public class BaritoneScript extends Module {
     );
 
     public BaritoneScript() {super(NetherFreedom.MAIN, "Baritone miner", "mines shit");}
-    //ask carlos for the y pos
     public BlockPos cornerOne, cornerTwo, cornerThree, cornerFour;
     private BlockPos currGoal, barPos, offsetPos;
     private  Boolean offsetting = false;
@@ -124,8 +123,8 @@ public class BaritoneScript extends Module {
 		currGoal = cornerThree;
         barPos = cornerOne;
 
-        baritoneSettings.blockPlacementPenalty.value = 20.0;
-        baritoneSettings.allowPlace.value = false;
+        baritoneSettings.blockPlacementPenalty.value = 0.0;
+        baritoneSettings.allowPlace.value = true;
     }
 
     @EventHandler
@@ -175,6 +174,10 @@ public class BaritoneScript extends Module {
 
         if(!currPlayerPos.equals(barPos) && !offsetting ){
             try{
+                BlockPos preBarPos = barPos.offset(goalDir.getOpposite(),1);
+                if(currPlayerPos.equals(preBarPos)){
+                    barPos = new BlockPos(barPos.offset(goalDir));
+                }
                 setGoal(barPos);
             } catch(Exception e){
                 String stacktrace = ExceptionUtils.getStackTrace(e);
