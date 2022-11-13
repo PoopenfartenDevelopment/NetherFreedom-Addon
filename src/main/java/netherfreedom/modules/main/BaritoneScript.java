@@ -11,9 +11,11 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.world.LiquidFiller;
+import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
+import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import netherfreedom.modules.NetherFreedom;
@@ -29,13 +31,8 @@ public class BaritoneScript extends Module {
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
-    public enum debugs{
-        None,
-        baritonePathing,
-        whatItDO
-
-    }
     //todo: find a better fucking way to get coords as settings
+    //todo: make 2 modes one stops at certin coords the other goes infinite
     private final Setting<Integer> corner1X = sgGeneral.add(new IntSetting.Builder()
             .name("corner1X")
             .description("the first corner of the square where it will mine")
@@ -96,10 +93,10 @@ public class BaritoneScript extends Module {
             .build()
     );
 
-    private final Setting<debugs> debug = sgGeneral.add(new EnumSetting.Builder<debugs>()
+    private final Setting<Boolean> debug = sgGeneral.add(new BoolSetting.Builder()
             .name("debug")
             .description("don't use this")
-            .defaultValue(debugs.None)
+            .defaultValue(false)
             .build()
     );
 
@@ -168,7 +165,7 @@ public class BaritoneScript extends Module {
         if(currPlayerPos.equals(cornerOne)){
             goalDir = findBlockDir(currPlayerPos,currGoal);
             dist = findDistance(currPlayerPos,currGoal,goalDir);
-            info(String.valueOf(currGoal));
+            if(debug.get())info(String.valueOf(currGoal));
             activateDiggingModules();
         }
 
@@ -179,38 +176,41 @@ public class BaritoneScript extends Module {
                     barPos = new BlockPos(barPos.offset(goalDir));
                 }
                 setGoal(barPos);
+                placeUnder(barPos);
             } catch(Exception e){
                 String stacktrace = ExceptionUtils.getStackTrace(e);
-                info(stacktrace);
+                if(debug.get())info(stacktrace);
             }
         }
 
-        if (currPlayerPos.equals(barPos)){
-            barPos = new BlockPos(currPlayerPos.offset(goalDir,3));
-
-        }
-
         if (currPlayerPos.equals(currGoal)){
-            info("reached end of line");
+            if(debug.get())info("reached end of line");
             offsetPos = moveUpLine(currGoal,nukerOffset);
             setGoal(offsetPos);
             offsetting = true;
         }
 
         if(currPlayerPos.equals(offsetPos)){
-            info("offsetting");
+            if(debug.get())info("offsetting");
             try{
                 currGoal = new BlockPos(offsetPos.offset(goalDir.getOpposite(),dist));
-                info(String.valueOf(currGoal));
+                if(debug.get())info(String.valueOf(currGoal));
                 goalDir = goalDir.getOpposite();
             }catch (Exception e){
                 String stacktrace = ExceptionUtils.getStackTrace(e);
-                info(stacktrace);
+                if(debug.get())info(stacktrace);
             }
-            info(String.valueOf(currGoal));
+            if(debug.get())info(String.valueOf(currGoal));
             barPos = offsetPos;
             offsetting = false;
             offsetPos = null;
+        }
+    }
+
+    private void placeUnder(BlockPos pos){
+        BlockPos under = new BlockPos(pos.offset(Direction.DOWN));
+        if(mc.world.getBlockState(under).isAir()){
+            BlockUtils.place(under, InvUtils.findInHotbar(Blocks.NETHERRACK.asItem()),false,0);
         }
     }
 
