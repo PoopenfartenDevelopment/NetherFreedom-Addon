@@ -86,17 +86,20 @@ public class BaritoneScript extends Module {
     public BlockPos cornerThree, cornerFour;
     private BlockPos currGoal, barPos, offsetPos;
     private Boolean offsetting, isPaused, bindPressed, refilling = false;
-    int ran, dist = 0;
+    int dist = 0;
     Direction dirToOpposite, goalDir;
 
     @Override
     public void onActivate() {
+        //makes sure the corners are at the same y-level
         if(cornerOne.get().getY() != cornerTwo.get().getY()){
             info("Y-levels are not the same");
             toggle();
         }
+        //defines the 2 other corners to create a square based on the 2 positions the user defined
         cornerThree = new BlockPos(cornerOne.get().getX(), cornerOne.get().getY(), cornerTwo.get().getZ());
         cornerFour = new BlockPos(cornerTwo.get().getX(), cornerOne.get().getY(), cornerOne.get().getZ());
+
 
         isPaused = false;
 		currGoal = cornerThree;
@@ -107,12 +110,6 @@ public class BaritoneScript extends Module {
         baritoneSettings.allowPlace.value = true;
     }
 
-    @EventHandler
-    public void onDisconnect() {
-        if (modules.get(BaritoneScript.class).isActive()){
-            toggle();
-        }
-    }
 
     @Override
     public void onDeactivate() {
@@ -121,7 +118,6 @@ public class BaritoneScript extends Module {
 		barPos = null;
 		currGoal = null;
         offsetting = false;
-        ran = 0;
         dist = 0;
     }
 
@@ -134,9 +130,7 @@ public class BaritoneScript extends Module {
                 event.renderer.box(cornerThree,Color.GREEN,Color.GREEN, ShapeMode.Both,0);
                 event.renderer.box(cornerFour,Color.GREEN,Color.GREEN, ShapeMode.Both,0);
                 event.renderer.box(currGoal,Color.BLUE,Color.BLUE, ShapeMode.Both,0);
-            }catch(Exception e){
-                if(debug.get()) info(String.valueOf(e));
-            }
+            }catch(Exception ignored){}
         }
     }
 
@@ -238,23 +232,6 @@ public class BaritoneScript extends Module {
         InvUtils.move().from(from).to(to);
     }
 
-    private int findDistance(BlockPos pos1, BlockPos pos2, Direction dir){
-        int dist = 0;
-        switch(dir){
-            case EAST:
-            case WEST:
-                dist = Math.abs(pos1.getX() - pos2.getX());
-            case SOUTH:
-            case NORTH:
-                dist = Math.abs(pos1.getZ() - pos2.getZ());
-        }
-        return dist;
-    }
-
-    private Direction findBlockDir(BlockPos originBlock, BlockPos goalBlock) {
-        BlockPos vec = new BlockPos(Math.signum(goalBlock.getX() - originBlock.getX()),0, Math.signum(goalBlock.getZ() - originBlock.getZ()));
-        return Direction.fromVector(vec);
-    }
 
 
     int findAndMoveToHotbar(Predicate<ItemStack> predicate) {
@@ -289,7 +266,6 @@ public class BaritoneScript extends Module {
         return -1;
     }
 
-
     private boolean hasItem(Item item) {
         for (int i = 0; i < mc.player.getInventory().main.size(); i++) {
             if (mc.player.getInventory().getStack(i).getItem() == item) return true;
@@ -306,6 +282,25 @@ public class BaritoneScript extends Module {
         if (!modules.get(NFNuker.class).isActive())
             modules.get(NFNuker.class).toggle();
     }
+
+    private int findDistance(BlockPos pos1, BlockPos pos2, Direction dir){
+        int dist = 0;
+        switch(dir){
+            case EAST:
+            case WEST:
+                dist = Math.abs(pos1.getX() - pos2.getX());
+            case SOUTH:
+            case NORTH:
+                dist = Math.abs(pos1.getZ() - pos2.getZ());
+        }
+        return dist;
+    }
+
+    private Direction findBlockDir(BlockPos originBlock, BlockPos goalBlock) {
+        BlockPos vec = new BlockPos(Math.signum(goalBlock.getX() - originBlock.getX()),0, Math.signum(goalBlock.getZ() - originBlock.getZ()));
+        return Direction.fromVector(vec);
+    }
+
 
 
 }
