@@ -9,7 +9,6 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
@@ -25,7 +24,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import netherfreedom.modules.NetherFreedom;
-import netherfreedom.modules.kmain.NFNuker;
 
 import java.util.function.Predicate;
 
@@ -34,27 +32,26 @@ public class BaritoneScript extends Module {
 
     private final IBaritone baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
     private final Settings baritoneSettings = BaritoneAPI.getSettings();
-    Modules modules = Modules.get();
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<BlockPos> cornerOne = sgGeneral.add(new BlockPosSetting.Builder()
-        .name("CornerOne")
-        .description("pos of corner one")
-        .defaultValue(new BlockPos(0,120,0))
-        .build()
+            .name("corner-1")
+            .description("Pos of corner one.")
+            .defaultValue(new BlockPos(10,120,10))
+            .build()
     );
 
     private final Setting<BlockPos> cornerTwo = sgGeneral.add(new BlockPosSetting.Builder()
-        .name("CornerTwo")
-        .description("pos of corner two")
-        .defaultValue(new BlockPos(0,120,0))
-        .build()
+            .name("corner-2")
+            .description("Pos of corner two.")
+            .defaultValue(new BlockPos(-10,120,-10))
+            .build()
     );
 
     private final Setting<Integer> nukerRange = sgGeneral.add(new IntSetting.Builder()
-            .name("nukerRange")
-            .description("the first corner of the square where it will mine")
+            .name("nuker-range")
+            .description("The first corner of the square where it will mine.")
             .defaultValue(4)
             .range(0,6)
             .sliderRange(0,6)
@@ -62,15 +59,15 @@ public class BaritoneScript extends Module {
     );
 
     private final Setting<Keybind> pauseBind = sgGeneral.add(new KeybindSetting.Builder()
-        .name("Baritone pause")
-        .description("pauses baritone ")
-        .defaultValue(Keybind.none())
-        .build()
+            .name("pause")
+            .description("Pauses baritone.")
+            .defaultValue(Keybind.none())
+            .build()
     );
 
     private final Setting<Boolean> renderCorners = sgGeneral.add(new BoolSetting.Builder()
-            .name("renderCorners")
-            .description("renders the 2 corners")
+            .name("render-corners")
+            .description("renders the 2 corners.")
             .defaultValue(true)
             .build()
     );
@@ -85,18 +82,26 @@ public class BaritoneScript extends Module {
     public BaritoneScript() {super(NetherFreedom.MAIN, "Baritone miner", "mines shit");}
     public BlockPos cornerThree, cornerFour;
     private BlockPos currGoal, barPos, offsetPos;
-    private Boolean offsetting, isPaused, bindPressed, refilling = false;
+    private Boolean offsetting, bindPressed, refilling = false;
+    private Boolean isPaused;
     int dist = 0;
     Direction dirToOpposite, goalDir;
 
     @Override
     public void onActivate() {
-        //makes sure the corners are at the same y-level
-        if(cornerOne.get().getY() != cornerTwo.get().getY()){
-            info("Y-levels are not the same");
+        // Makes sure the corners are at the same y-level
+        if (cornerOne.get().getY() != cornerTwo.get().getY()) {
+            info("Y levels are not the same, disabling.");
             toggle();
         }
-        //defines the 2 other corners to create a square based on the 2 positions the user defined
+
+        // Needs fixing
+        /*if (!Modules.get().isActive(DiggingTools.class)) {
+            info("DiggingTools isn't active, disabling.");
+            toggle();
+        }*/
+
+        // Defines the 2 other corners to create a square based on the 2 positions the user defined
         cornerThree = new BlockPos(cornerOne.get().getX(), cornerOne.get().getY(), cornerTwo.get().getZ());
         cornerFour = new BlockPos(cornerTwo.get().getX(), cornerOne.get().getY(), cornerOne.get().getZ());
 
@@ -110,7 +115,6 @@ public class BaritoneScript extends Module {
         baritoneSettings.allowPlace.value = true;
     }
 
-
     @Override
     public void onDeactivate() {
         baritone.getPathingBehavior().cancelEverything();
@@ -123,14 +127,14 @@ public class BaritoneScript extends Module {
 
     @EventHandler
     private void onRender(Render3DEvent event){
-        if(renderCorners.get()){
-            try{
+        if (renderCorners.get()) {
+            try {
                 event.renderer.box(cornerOne.get(),Color.RED,Color.RED, ShapeMode.Both,0);
                 event.renderer.box(cornerTwo.get(),Color.RED,Color.RED, ShapeMode.Both,0);
                 event.renderer.box(cornerThree,Color.GREEN,Color.GREEN, ShapeMode.Both,0);
                 event.renderer.box(cornerFour,Color.GREEN,Color.GREEN, ShapeMode.Both,0);
                 event.renderer.box(currGoal,Color.BLUE,Color.BLUE, ShapeMode.Both,0);
-            }catch(Exception ignored){}
+            } catch(Exception ignored){}
         }
     }
 
@@ -139,7 +143,7 @@ public class BaritoneScript extends Module {
         BlockPos currPlayerPos = mc.player.getBlockPos();
         int nukerOffset = nukerRange.get() * 2;
 
-        if(!hasItem(Items.NETHERITE_PICKAXE)){
+        if (!hasItem(Items.NETHERITE_PICKAXE)) {
             refilling = true;
             int slot = findAndMoveToHotbar(itemStack -> itemStack.getItem() == Items.SHULKER_BOX);
             BlockPos shulkerPlacePos = currPlayerPos.offset(goalDir);
@@ -148,50 +152,40 @@ public class BaritoneScript extends Module {
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(lookVec, Direction.UP, shulkerPlacePos, false));
         }
 
-        if(pauseBind.get().isPressed()){
-            if(!baritone.getBuilderProcess().isPaused()){
-                baritone.getCommandManager().execute("pause");
-            }
-            else{
-                baritone.getCommandManager().execute("resume");
-            }
-        }
-
-        if(currPlayerPos.equals(cornerOne.get())){
+        if (currPlayerPos.equals(cornerOne.get())) {
             goalDir = findBlockDir(currPlayerPos,currGoal);
             barPos = new BlockPos(cornerOne.get().offset(goalDir));
             dist = findDistance(currPlayerPos,currGoal,goalDir);
-            activateDiggingModules();
         }
 
-        if(!currPlayerPos.equals(barPos) && !offsetting && !refilling){
-            try{
+        if (!currPlayerPos.equals(barPos) && !offsetting && !refilling) {
+            try {
                 BlockPos preBarPos = new BlockPos(barPos.offset(goalDir.getOpposite(),1));
-                if(currPlayerPos.equals(preBarPos)){
+                if (currPlayerPos.equals(preBarPos)) {
                     barPos = new BlockPos(barPos.offset(goalDir));
                 }
                 setGoal(barPos);
                 placeUnder(barPos);
-            } catch(Exception ignored){}
+            } catch (Exception ignored) {}
         }
 
-        if(currPlayerPos.equals(barPos)){
+        if (currPlayerPos.equals(barPos)) {
             BlockPos whatever = new BlockPos(barPos.offset(goalDir.getOpposite()));
             setGoal(whatever);
         }
 
 
-        if (currPlayerPos.equals(currGoal)){
+        if (currPlayerPos.equals(currGoal)) {
             offsetPos = moveUpLine(currGoal,nukerOffset);
             setGoal(offsetPos);
             offsetting = true;
         }
 
-        if(currPlayerPos.equals(offsetPos)){
-            try{
+        if (currPlayerPos.equals(offsetPos)) {
+            try {
                 goalDir = goalDir.getOpposite();
                 currGoal = new BlockPos(offsetPos.offset(goalDir,dist));
-            }catch (Exception ignored){}
+            } catch (Exception ignored) {}
             barPos = new BlockPos(offsetPos.offset(goalDir,2));
             offsetting = false;
             offsetPos = null;
@@ -216,14 +210,14 @@ public class BaritoneScript extends Module {
         }
     }
 
-    private void placeUnder(BlockPos pos){
+    private void placeUnder(BlockPos pos) {
         BlockPos under = new BlockPos(pos.offset(Direction.DOWN));
-        if(mc.world.getBlockState(under).getMaterial().isReplaceable()){
+        if (mc.world.getBlockState(under).getMaterial().isReplaceable()) {
             BlockUtils.place(under, InvUtils.findInHotbar(Blocks.NETHERRACK.asItem()),false,0);
         }
     }
 
-    private BlockPos moveUpLine(BlockPos Pos, int nukerOffset){
+    private BlockPos moveUpLine(BlockPos Pos, int nukerOffset) {
         dirToOpposite= findBlockDir(cornerThree,cornerTwo.get());
         return new BlockPos(Pos.offset(dirToOpposite,nukerOffset));
     }
@@ -276,11 +270,6 @@ public class BaritoneScript extends Module {
 
     private void setGoal(BlockPos goal){
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(goal));
-    }
-
-    private void activateDiggingModules (){
-        if (!modules.get(NFNuker.class).isActive())
-            modules.get(NFNuker.class).toggle();
     }
 
     private int findDistance(BlockPos pos1, BlockPos pos2, Direction dir){

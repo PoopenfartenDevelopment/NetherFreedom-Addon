@@ -1,5 +1,12 @@
 package netherfreedom.modules.main;
 
+import meteordevelopment.meteorclient.events.game.GameLeftEvent;
+import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
+import meteordevelopment.meteorclient.settings.BoolSetting;
+import meteordevelopment.meteorclient.settings.Setting;
+import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.screen.DisconnectedScreen;
 import netherfreedom.modules.NetherFreedom;
 import netherfreedom.modules.kmain.AutoEatPlus;
 import netherfreedom.modules.kmain.NFNuker;
@@ -10,8 +17,30 @@ import meteordevelopment.meteorclient.systems.modules.misc.AutoLog;
 import meteordevelopment.meteorclient.systems.modules.world.LiquidFiller;
 
 public class DiggingTools extends Module {
+    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+
+    private final Setting<Boolean> disableOnDisconnect = sgGeneral.add(new BoolSetting.Builder()
+        .name("disable-on-disconnect")
+        .description("Disables DiggingTools when you disconnect from a server.")
+        .defaultValue(true)
+        .build()
+    );
+
 
     public DiggingTools() { super(NetherFreedom.MAIN, "digging-tools", "Automatically toggles the necessary modules to dig."); }
+
+
+    @EventHandler
+    private void onScreenOpen(OpenScreenEvent event) {
+        if (disableOnDisconnect.get() && event.screen instanceof DisconnectedScreen) {
+            toggle();
+        }
+    }
+
+    @EventHandler
+    private void onGameLeft(GameLeftEvent event) {
+        if (disableOnDisconnect.get()) toggle();
+    }
 
     @Override
     public void onActivate() {

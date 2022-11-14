@@ -1,7 +1,12 @@
+/*
+ * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+ * Copyright (c) Meteor Development.
+ * Enhanced by RedCarlos26
+ */
+
 package netherfreedom.modules.main;
 
 import netherfreedom.modules.NetherFreedom;
-import meteordevelopment.meteorclient.events.meteor.MouseButtonEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.EnumSetting;
@@ -10,14 +15,10 @@ import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.combat.AutoTotem;
-import meteordevelopment.meteorclient.utils.misc.input.KeyAction;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+import net.minecraft.item.*;
 
 public class HandManager extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -32,7 +33,7 @@ public class HandManager extends Module {
     private final Setting<Boolean> hotbar = sgGeneral.add(new BoolSetting.Builder()
         .name("hotbar")
         .description("Whether to use items from your hotbar.")
-        .defaultValue(false)
+        .defaultValue(true)
         .build()
     );
 
@@ -51,8 +52,11 @@ public class HandManager extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Pre event) {
+        AutoTotem autoTotem = Modules.get().get(AutoTotem.class);
+
         currentItem = item.get();
 
+        // Checking offhand item
         if (mc.player.getOffHandStack().getItem() != currentItem.item) {
             FindItemResult item = InvUtils.find(itemStack -> itemStack.getItem() == currentItem.item, hotbar.get() ? 0 : 9, 35);
 
@@ -61,6 +65,11 @@ public class HandManager extends Module {
                     warning("Chosen item not found.");
                     sentMessage = true;
                 }
+            }
+
+            else if (!autoTotem.isLocked() && !item.isOffhand()) {
+                InvUtils.move().from(item.slot()).toOffhand();
+                sentMessage = false;
             }
         }
     }
@@ -74,7 +83,8 @@ public class HandManager extends Module {
         EGap(Items.ENCHANTED_GOLDEN_APPLE),
         GoldenCarrot(Items.GOLDEN_CARROT),
         Porkchop(Items.COOKED_PORKCHOP),
-        Steak(Items.COOKED_BEEF);
+        Steak(Items.COOKED_BEEF),
+        Totem(Items.TOTEM_OF_UNDYING);
 
         net.minecraft.item.Item item;
 
