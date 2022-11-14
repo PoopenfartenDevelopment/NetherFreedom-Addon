@@ -4,11 +4,9 @@ import netherfreedom.modules.NetherFreedom;
 import netherfreedom.modules.kmain.AutoEatPlus;
 import netherfreedom.modules.kmain.NFNuker;
 import netherfreedom.modules.kmain.InvManager;
-import netherfreedom.modules.kmain.ScaffoldPlus;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.misc.AutoLog;
-import meteordevelopment.meteorclient.systems.modules.movement.SafeWalk;
 import meteordevelopment.meteorclient.systems.modules.world.LiquidFiller;
 
 public class DiggingTools extends Module {
@@ -25,9 +23,6 @@ public class DiggingTools extends Module {
         modules.get(InvManager.class).toggle();
         modules.get(LiquidFiller.class).toggle();
         modules.get(NFNuker.class).toggle();
-        modules.get(RotationsPlus.class).toggle();
-        modules.get(SafeWalk.class).toggle();
-        modules.get(ScaffoldPlus.class).toggle();
     }
 
     @Override
@@ -46,11 +41,5 @@ public class DiggingTools extends Module {
             modules.get(LiquidFiller.class).toggle();
         if (modules.get(NFNuker.class).isActive())
             modules.get(NFNuker.class).toggle();
-        if (modules.get(RotationsPlus.class).isActive())
-            modules.get(RotationsPlus.class).toggle();
-        if (modules.get(SafeWalk.class).isActive())
-            modules.get(SafeWalk.class).toggle();
-        if (modules.get(ScaffoldPlus.class).isActive())
-            modules.get(ScaffoldPlus.class).toggle();
     }
 }
