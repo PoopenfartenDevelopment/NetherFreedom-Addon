@@ -182,7 +182,7 @@ public class BaritoneScript extends Module {
         }
 
         if(currPlayerPos.equals(barPos)){
-            BlockPos whatever = new BlockPos(barPos.offset(goalDir,2));
+            BlockPos whatever = new BlockPos(barPos.offset(goalDir.getOpposite()));
             setGoal(whatever);
         }
 
