@@ -222,8 +222,6 @@ public class BaritoneScript extends Module {
     }
 
     private void activateDiggingModules (){
-        if (!modules.get(LiquidFiller.class).isActive())
-            modules.get(LiquidFiller.class).toggle();
         if (!modules.get(NFNuker.class).isActive())
             modules.get(NFNuker.class).toggle();
     }
