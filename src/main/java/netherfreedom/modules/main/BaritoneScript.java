@@ -54,7 +54,7 @@ public class BaritoneScript extends Module {
             .build()
     );
 
-    private final Setting<Keybind> baritonePause = sgGeneral.add(new KeybindSetting.Builder()
+    private final Setting<Keybind> pauseBind = sgGeneral.add(new KeybindSetting.Builder()
         .name("Baritone pause")
         .description("pauses baritone ")
         .defaultValue(Keybind.none())
@@ -79,12 +79,13 @@ public class BaritoneScript extends Module {
     public BlockPos cornerThree, cornerFour;
     private BlockPos currGoal, barPos, offsetPos;
     private Boolean offsetting = false;
-    private Boolean hasPaused;
-    int ran,dist = 0;
+    private Boolean isPaused = false;
+    private boolean bindPressed = false;
+    int ran, dist = 0;
     Direction dirToOpposite, goalDir;
 
     @Override
-    public void onActivate(){
+    public void onActivate() {
         if(cornerOne.get().getY() != cornerTwo.get().getY()){
             info("Y-levels are not the same");
             toggle();
@@ -92,7 +93,7 @@ public class BaritoneScript extends Module {
         cornerThree = new BlockPos(cornerOne.get().getX(), cornerOne.get().getY(), cornerTwo.get().getZ());
         cornerFour = new BlockPos(cornerTwo.get().getX(), cornerOne.get().getY(), cornerOne.get().getZ());
 
-        hasPaused = false;
+        isPaused = false;
 		currGoal = cornerThree;
         setGoal(cornerOne.get());
 
@@ -102,20 +103,19 @@ public class BaritoneScript extends Module {
     }
 
     @EventHandler
-    public void onDisconnect(){
+    public void onDisconnect() {
         if (modules.get(BaritoneScript.class).isActive()){
             toggle();
         }
     }
 
     @Override
-    public void onDeactivate(){
+    public void onDeactivate() {
         baritone.getPathingBehavior().cancelEverything();
         dirToOpposite = null;
 		barPos = null;
 		currGoal = null;
         offsetting = false;
-        hasPaused = false;
         ran = 0;
         dist = 0;
     }
@@ -140,18 +140,7 @@ public class BaritoneScript extends Module {
         BlockPos currPlayerPos = mc.player.getBlockPos();
         int nukerOffset = nukerRange.get() * 2;
 
-        if(baritonePause.get().isPressed()){
-            if (!hasPaused) {
-                baritone.getCommandManager().execute("pause");
-                hasPaused = true;
-            }
-            else {
-                baritone.getCommandManager().execute("resume");
-                hasPaused = false;
-            }
-        }
-
-        if(currPlayerPos.equals(cornerOne.get())){
+        if (currPlayerPos.equals(cornerOne.get())) {
             goalDir = findBlockDir(currPlayerPos,currGoal);
             barPos = new BlockPos(cornerOne.get().offset(goalDir));
             dist = findDistance(currPlayerPos,currGoal,goalDir);
@@ -189,6 +178,24 @@ public class BaritoneScript extends Module {
             barPos = new BlockPos(offsetPos.offset(goalDir,2));
             offsetting = false;
             offsetPos = null;
+        }
+    }
+
+    @EventHandler
+    private void onTick(TickEvent.Post event) {
+        if (!pauseBind.get().isPressed()) bindPressed = false;
+
+        if (pauseBind.get().isPressed() && !bindPressed && !isPaused) {
+            baritone.getCommandManager().execute("pause");
+            isPaused = true;
+            bindPressed = true;
+            return;
+        }
+
+        if (pauseBind.get().isPressed() && !bindPressed && isPaused) {
+            baritone.getCommandManager().execute("resume");
+            isPaused = false;
+            bindPressed = true;
         }
     }
 
