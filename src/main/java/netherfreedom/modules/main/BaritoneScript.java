@@ -10,17 +10,24 @@ import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
-import meteordevelopment.meteorclient.systems.modules.world.LiquidFiller;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import netherfreedom.modules.NetherFreedom;
 import netherfreedom.modules.kmain.NFNuker;
+
+import java.util.function.Predicate;
 
 
 public class BaritoneScript extends Module {
@@ -78,9 +85,7 @@ public class BaritoneScript extends Module {
     public BaritoneScript() {super(NetherFreedom.MAIN, "Baritone miner", "mines shit");}
     public BlockPos cornerThree, cornerFour;
     private BlockPos currGoal, barPos, offsetPos;
-    private Boolean offsetting = false;
-    private Boolean isPaused = false;
-    private boolean bindPressed = false;
+    private Boolean offsetting, isPaused, bindPressed, refilling = false;
     int ran, dist = 0;
     Direction dirToOpposite, goalDir;
 
@@ -140,14 +145,32 @@ public class BaritoneScript extends Module {
         BlockPos currPlayerPos = mc.player.getBlockPos();
         int nukerOffset = nukerRange.get() * 2;
 
-        if (currPlayerPos.equals(cornerOne.get())) {
+        if(!hasItem(Items.NETHERITE_PICKAXE)){
+            refilling = true;
+            int slot = findAndMoveToHotbar(itemStack -> itemStack.getItem() == Items.SHULKER_BOX);
+            BlockPos shulkerPlacePos = currPlayerPos.offset(goalDir);
+            BlockUtils.place(shulkerPlacePos, Hand.MAIN_HAND, slot, true, 0, true, true, false);
+            Vec3d lookVec = Vec3d.ofCenter(shulkerPlacePos, 1);
+            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(lookVec, Direction.UP, shulkerPlacePos, false));
+        }
+
+        if(pauseBind.get().isPressed()){
+            if(!baritone.getBuilderProcess().isPaused()){
+                baritone.getCommandManager().execute("pause");
+            }
+            else{
+                baritone.getCommandManager().execute("resume");
+            }
+        }
+
+        if(currPlayerPos.equals(cornerOne.get())){
             goalDir = findBlockDir(currPlayerPos,currGoal);
             barPos = new BlockPos(cornerOne.get().offset(goalDir));
             dist = findDistance(currPlayerPos,currGoal,goalDir);
             activateDiggingModules();
         }
 
-        if(!currPlayerPos.equals(barPos) && !offsetting ){
+        if(!currPlayerPos.equals(barPos) && !offsetting && !refilling){
             try{
                 BlockPos preBarPos = new BlockPos(barPos.offset(goalDir.getOpposite(),1));
                 if(currPlayerPos.equals(preBarPos)){
@@ -211,6 +234,10 @@ public class BaritoneScript extends Module {
         return new BlockPos(Pos.offset(dirToOpposite,nukerOffset));
     }
 
+    private void addSlots(int to, int from) {
+        InvUtils.move().from(from).to(to);
+    }
+
     private int findDistance(BlockPos pos1, BlockPos pos2, Direction dir){
         int dist = 0;
         switch(dir){
@@ -229,13 +256,53 @@ public class BaritoneScript extends Module {
         return Direction.fromVector(vec);
     }
 
+
+    int findAndMoveToHotbar(Predicate<ItemStack> predicate) {
+        int slot = findSlot( predicate, true);
+        if (slot != -1) return slot;
+
+        int hotbarSlot = findHotbarSlot();
+
+        slot = findSlot(predicate, false);
+
+        // Move items from inventory to hotbar
+        InvUtils.move().from(slot).toHotbar(hotbarSlot);
+        InvUtils.dropHand();
+
+        return hotbarSlot;
+    }
+
+    private int findSlot(Predicate<ItemStack> predicate, boolean hotbar) {
+        for (int i = hotbar ? 0 : 9; i < (hotbar ? 9 : mc.player.getInventory().main.size()); i++) {
+            if (predicate.test(mc.player.getInventory().getStack(i))) return i;
+        }
+        return -1;
+    }
+
+    private int findHotbarSlot() {
+        for (int i = 0; i < 9; i++) {
+            ItemStack itemStack = mc.player.getInventory().getStack(i);
+            // Return if the slot is empty
+            if (itemStack.isEmpty()) return i;
+            // Return if the slot contains a tool and replacing tools is enabled
+        }
+        return -1;
+    }
+
+
+    private boolean hasItem(Item item) {
+        for (int i = 0; i < mc.player.getInventory().main.size(); i++) {
+            if (mc.player.getInventory().getStack(i).getItem() == item) return true;
+        }
+        return false;
+    }
+
+
     private void setGoal(BlockPos goal){
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(goal));
     }
 
     private void activateDiggingModules (){
-        if (!modules.get(LiquidFiller.class).isActive())
-            modules.get(LiquidFiller.class).toggle();
         if (!modules.get(NFNuker.class).isActive())
             modules.get(NFNuker.class).toggle();
     }
