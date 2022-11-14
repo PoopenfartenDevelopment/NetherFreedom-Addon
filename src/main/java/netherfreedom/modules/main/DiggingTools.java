@@ -32,9 +32,7 @@ public class DiggingTools extends Module {
 
     @EventHandler
     private void onScreenOpen(OpenScreenEvent event) {
-        if (disableOnDisconnect.get() && event.screen instanceof DisconnectedScreen) {
-            toggle();
-        }
+        if (disableOnDisconnect.get() && event.screen instanceof DisconnectedScreen) toggle();
     }
 
     @EventHandler

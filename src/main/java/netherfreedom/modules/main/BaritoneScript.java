@@ -79,7 +79,7 @@ public class BaritoneScript extends Module {
             .build()
     );
 
-    public BaritoneScript() {super(NetherFreedom.MAIN, "Baritone miner", "mines shit");}
+    public BaritoneScript() {super(NetherFreedom.MAIN, "baritone-miner", "Allows you to mine while automatically. Use with DiggingTools.");}
     public BlockPos cornerThree, cornerFour;
     private BlockPos currGoal, barPos, offsetPos;
     private Boolean offsetting, bindPressed, refilling = false;
@@ -91,7 +91,7 @@ public class BaritoneScript extends Module {
     public void onActivate() {
         // Makes sure the corners are at the same y-level
         if (cornerOne.get().getY() != cornerTwo.get().getY()) {
-            info("Y levels are not the same, disabling.");
+            info("Corners Y levels are not the same, disabling.");
             toggle();
         }
 

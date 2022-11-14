@@ -1,7 +1,7 @@
 package netherfreedom.modules.main;
 
 import netherfreedom.modules.NetherFreedom;
-import netherfreedom.utils.ArmorNotifyUtils;
+import netherfreedom.utils.NFUtils;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.DoubleSetting;
 import meteordevelopment.meteorclient.settings.Setting;
@@ -45,29 +45,29 @@ public class ArmorNotify extends Module {
         Iterable<ItemStack> armorPieces = mc.player.getArmorItems();
         for (ItemStack armorPiece : armorPieces) {
 
-            if (ArmorNotifyUtils.checkThreshold(armorPiece, threshold.get())) {
-                if (ArmorNotifyUtils.isHelm(armorPiece) && !alertedHelm) {
+            if (NFUtils.checkThreshold(armorPiece, threshold.get())) {
+                if (NFUtils.isHelm(armorPiece) && !alertedHelm) {
                     warning("Your helmet dura is low!");
                     alertedHelm = true;
                 }
-                if (ArmorNotifyUtils.isChest(armorPiece) && !alertedChest) {
+                if (NFUtils.isChest(armorPiece) && !alertedChest) {
                     warning("Your chestplate dura is low!");
                     alertedChest = true;
                 }
-                if (ArmorNotifyUtils.isLegs(armorPiece) && !alertedLegs) {
+                if (NFUtils.isLegs(armorPiece) && !alertedLegs) {
                     warning("Your leggings dura is low!");
                     alertedLegs = true;
                 }
-                if (ArmorNotifyUtils.isBoots(armorPiece) && !alertedBoots) {
+                if (NFUtils.isBoots(armorPiece) && !alertedBoots) {
                     warning("Your boots dura is low!");
                     alertedBoots = true;
                 }
             }
-            if (!ArmorNotifyUtils.checkThreshold(armorPiece, threshold.get())) {
-                if (ArmorNotifyUtils.isHelm(armorPiece) && alertedHelm) alertedHelm = false;
-                if (ArmorNotifyUtils.isChest(armorPiece) && alertedChest) alertedChest = false;
-                if (ArmorNotifyUtils.isLegs(armorPiece) && alertedLegs) alertedLegs = false;
-                if (ArmorNotifyUtils.isBoots(armorPiece) && alertedBoots) alertedBoots = false;
+            if (!NFUtils.checkThreshold(armorPiece, threshold.get())) {
+                if (NFUtils.isHelm(armorPiece) && alertedHelm) alertedHelm = false;
+                if (NFUtils.isChest(armorPiece) && alertedChest) alertedChest = false;
+                if (NFUtils.isLegs(armorPiece) && alertedLegs) alertedLegs = false;
+                if (NFUtils.isBoots(armorPiece) && alertedBoots) alertedBoots = false;
             }
         }
     }

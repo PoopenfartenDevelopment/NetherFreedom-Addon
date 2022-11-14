@@ -4,7 +4,6 @@ import netherfreedom.commands.*;
 import netherfreedom.modules.hud.*;
 import netherfreedom.modules.main.*;
 import netherfreedom.modules.kmain.*;
-import netherfreedom.utils.NFDamageUtils;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.systems.Systems;
@@ -33,7 +32,6 @@ public class NetherFreedom extends MeteorAddon {
 
 		MeteorClient.EVENT_BUS.registerLambdaFactory("netherfreedom", (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
 
-        NFDamageUtils.init();
         setCs2Ps();
 
         // Modules
@@ -42,7 +40,6 @@ public class NetherFreedom extends MeteorAddon {
         // Main (Java)
         modules.add(new AfkLogout());
         modules.add(new ArmorNotify());
-        modules.add(new Aura());
         modules.add(new AutoWalkPlus());
         modules.add(new BaritoneScript());
         modules.add(new ChatTweaks());
