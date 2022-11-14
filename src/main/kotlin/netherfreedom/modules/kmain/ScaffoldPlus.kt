@@ -21,7 +21,7 @@ object ScaffoldPlus:MeteorModule(NetherFreedom.MAIN, "Scaffold+", "Scaffolds blo
     private var ext by mainGroup.add(IValue("Extend", 1, "How much to place in front of you", 0..5, 1))
     private var tower by mainGroup.add(BValue("Tower", false, "Makes towering easier"))
     private var towerMult by mainGroup.add(DValue("Multi", 0.7454, "Makes tower potentially bypass stricter anti-cheats.", 0.0..2.0, 0.0001))
-    private var keepY by mainGroup.add(IValue("KeepY", -1, "Keeps the Y value of the block", -1..255, 1))
+    private var keepY by mainGroup.add(IValue("KeepY", 120, "Keeps the Y value of the block", -1..255, 1))
 
     var worked:Boolean = false
 

@@ -5,8 +5,6 @@ import netherfreedom.modules.hud.*;
 import netherfreedom.modules.main.*;
 import netherfreedom.modules.kmain.*;
 import netherfreedom.utils.NFDamageUtils;
-import netherfreedom.utils.PacketFlyUtils;
-import netherfreedom.utils.ServiceLoader;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.systems.Systems;
@@ -36,8 +34,6 @@ public class NetherFreedom extends MeteorAddon {
 		MeteorClient.EVENT_BUS.registerLambdaFactory("netherfreedom", (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
 
         NFDamageUtils.init();
-        ServiceLoader.load();
-        PacketFlyUtils.init();
         setCs2Ps();
 
         // Modules
@@ -64,13 +60,11 @@ public class NetherFreedom extends MeteorAddon {
         // Commands
         Commands commands = Commands.get();
         commands.add(new Disconnect());
-        commands.add(new ToggleModules());
 
         // HUD
         Hud hud = Systems.get(Hud.class);
         hud.register(BindsHud.INFO);
         hud.register(NFWelcomeHud.INFO);
-        hud.register(SpotifyHud.INFO);
 	}
 
     @Override

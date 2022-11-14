@@ -78,7 +78,8 @@ public class BaritoneScript extends Module {
     public BaritoneScript() {super(NetherFreedom.MAIN, "Baritone miner", "mines shit");}
     public BlockPos cornerThree, cornerFour;
     private BlockPos currGoal, barPos, offsetPos;
-    private  Boolean offsetting = false;
+    private Boolean offsetting = false;
+    private Boolean hasPaused;
     int ran,dist = 0;
     Direction dirToOpposite, goalDir;
 
@@ -91,6 +92,7 @@ public class BaritoneScript extends Module {
         cornerThree = new BlockPos(cornerOne.get().getX(), cornerOne.get().getY(), cornerTwo.get().getZ());
         cornerFour = new BlockPos(cornerTwo.get().getX(), cornerOne.get().getY(), cornerOne.get().getZ());
 
+        hasPaused = false;
 		currGoal = cornerThree;
         setGoal(cornerOne.get());
 
@@ -113,6 +115,7 @@ public class BaritoneScript extends Module {
 		barPos = null;
 		currGoal = null;
         offsetting = false;
+        hasPaused = false;
         ran = 0;
         dist = 0;
     }
@@ -138,11 +141,13 @@ public class BaritoneScript extends Module {
         int nukerOffset = nukerRange.get() * 2;
 
         if(baritonePause.get().isPressed()){
-            if(!baritone.getBuilderProcess().isPaused()){
+            if (!hasPaused) {
                 baritone.getCommandManager().execute("pause");
+                hasPaused = true;
             }
-            else{
+            else {
                 baritone.getCommandManager().execute("resume");
+                hasPaused = false;
             }
         }
 
