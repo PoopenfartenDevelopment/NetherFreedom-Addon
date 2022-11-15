@@ -147,6 +147,7 @@ public class BaritoneScript extends Module {
     @Override
     public void onActivate() {
         // Makes sure the corners are at the same y-level
+        //todo: make a function for these errors
         if (cornerOne.get().getY() != cornerTwo.get().getY()) {
             info("Corners Y levels are not the same, disabling.");
             baritone.getPathingBehavior().cancelEverything();
@@ -216,17 +217,28 @@ public class BaritoneScript extends Module {
     public void onTick(TickEvent.Pre event){
         BlockPos currPlayerPos = mc.player.getBlockPos();
         int nukerOffset = nukerRange.get() * 2;
+        BlockPos placePos = null;
 
         if (!hasPickaxes() && !placedShulker && getPickaxe.get()) {
             refilling = true;
             info("ran out of pickaxes... refilling");
             baritone.getCommandManager().execute("pause");
-            BlockPos placePos = currPlayerPos.offset(goalDir.getOpposite());
+            placePos = currPlayerPos.offset(goalDir.getOpposite(),2);
             if(modules.get(NFNuker.class).isActive())modules.get(NFNuker.class).toggle();
             placeRefillShulker(placePos);
-            Vec3d lookVec = Vec3d.ofCenter(placePos, 1);
-            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(lookVec, Direction.UP, placePos, false));
+            info("placing from slot" + shulkerSlot.get());
             placedShulker = true;
+            return;
+        }
+
+        if (!hasPickaxes() && placedShulker){
+            //todo make it steal the picks from the shulker
+            try{
+                Vec3d lookVec = Vec3d.ofCenter(placePos, 1);
+                mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(lookVec, Direction.UP, placePos, false));
+            }catch (Exception e){
+                info("fucked");
+            }
         }
 
         if (currPlayerPos.equals(cornerOne.get())) {
@@ -288,7 +300,7 @@ public class BaritoneScript extends Module {
             bindPressed = true;
         }
     }
-
+    //bot pathing logic stuff
     private void placeUnder(BlockPos pos) {
         BlockPos under = new BlockPos(pos.offset(Direction.DOWN));
         if (mc.world.getBlockState(under).getMaterial().isReplaceable()) {
@@ -296,23 +308,15 @@ public class BaritoneScript extends Module {
         }
     }
 
+     private Direction findBlockDir(BlockPos originBlock, BlockPos goalBlock) {
+        BlockPos vec = new BlockPos(Math.signum(goalBlock.getX() - originBlock.getX()),0, Math.signum(goalBlock.getZ() - originBlock.getZ()));
+        return Direction.fromVector(vec);
+    }
+
     private BlockPos moveUpLine(BlockPos Pos, int nukerOffset) {
         dirToOpposite= findBlockDir(cornerThree,cornerTwo.get());
         return new BlockPos(Pos.offset(dirToOpposite,nukerOffset));
     }
-
-
-    private void placeRefillShulker(BlockPos shulkerPlacePos){
-        BlockUtils.place(shulkerPlacePos, Hand.MAIN_HAND, shulkerSlot.get(), true, 0, true, true, false);
-    }
-
-    private boolean hasPickaxes() {
-        for (int i = 0; i < mc.player.getInventory().main.size(); i++) {
-            if (mc.player.getInventory().getStack(i).getItem() == Items.NETHERITE_PICKAXE) return true;
-        }
-        return false;
-    }
-
 
     private void setGoal(BlockPos goal){
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(goal));
@@ -331,11 +335,17 @@ public class BaritoneScript extends Module {
         return dist;
     }
 
-    private Direction findBlockDir(BlockPos originBlock, BlockPos goalBlock) {
-        BlockPos vec = new BlockPos(Math.signum(goalBlock.getX() - originBlock.getX()),0, Math.signum(goalBlock.getZ() - originBlock.getZ()));
-        return Direction.fromVector(vec);
+    //bot pickaxe refilling stuff
+    private void placeRefillShulker(BlockPos shulkerPlacePos){
+        BlockUtils.place(shulkerPlacePos, Hand.MAIN_HAND, shulkerSlot.get(), true, 0, true, true, false);
     }
 
+    private boolean hasPickaxes() {
+        for (int i = 0; i < mc.player.getInventory().main.size(); i++) {
+            if (mc.player.getInventory().getStack(i).getItem() == Items.NETHERITE_PICKAXE) return true;
+        }
+        return false;
+    }
 
     public static int getRows(ScreenHandler handler) {
         return (handler instanceof GenericContainerScreenHandler ? ((GenericContainerScreenHandler) handler).getRows() : 3);

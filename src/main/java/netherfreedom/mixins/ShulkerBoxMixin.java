@@ -1,5 +1,6 @@
 package netherfreedom.mixins;
 
+import meteordevelopment.meteorclient.systems.modules.Modules;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
 import net.minecraft.entity.player.PlayerInventory;
@@ -13,10 +14,13 @@ public abstract class ShulkerBoxMixin extends HandledScreen<ShulkerBoxScreenHand
     public ShulkerBoxMixin(ShulkerBoxScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
     }
+    BaritoneScript BarScript = Modules.get().get(BaritoneScript.class);
 
     @Override
     protected void init() {
         super.init();
-        BaritoneScript.steal(handler);
+        if (BarScript.isActive()){
+            BaritoneScript.steal(handler);
+        }
     }
 }
