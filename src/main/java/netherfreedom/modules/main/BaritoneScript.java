@@ -17,7 +17,6 @@ import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
@@ -27,8 +26,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import netherfreedom.modules.NetherFreedom;
-
-import java.util.function.Predicate;
+import netherfreedom.modules.kmain.NFNuker;
 
 
 public class BaritoneScript extends Module {
@@ -45,6 +43,7 @@ public class BaritoneScript extends Module {
 
     private final IBaritone baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
     private final Settings baritoneSettings = BaritoneAPI.getSettings();
+    Modules modules = Modules.get();
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
@@ -71,13 +70,6 @@ public class BaritoneScript extends Module {
             .build()
     );
 
-    private final Setting<Keybind> pauseBind = sgGeneral.add(new KeybindSetting.Builder()
-            .name("pause")
-            .description("Pauses baritone.")
-            .defaultValue(Keybind.none())
-            .build()
-    );
-
     private final Setting<Boolean> DTCheck = sgGeneral.add(new BoolSetting.Builder()
             .name("digging-tools-check")
             .description("Disables itself if DiggingTools isn't on.")
@@ -92,11 +84,27 @@ public class BaritoneScript extends Module {
             .build()
     );
 
+    private final Setting<Keybind> pauseBind = sgGeneral.add(new KeybindSetting.Builder()
+            .name("pause")
+            .description("Pauses baritone.")
+            .defaultValue(Keybind.none())
+            .build()
+    );
+
     private final Setting<Boolean> getPickaxe = sgGeneral.add(new BoolSetting.Builder()
         .name("get-pickaxe-from-skulker")
         .description("if it runs out of pickaxes it will get pickaxes from a shulker")
         .defaultValue(true)
         .build()
+    );
+
+    private final Setting<Integer> shulkerSlot = sgGeneral.add(new IntSetting.Builder()
+            .name("nuker-range")
+            .description("The first corner of the square where it will mine.")
+            .defaultValue(0)
+            .range(0,9)
+            .sliderRange(0,9)
+            .build()
     );
 
     private final Setting<Boolean> debug = sgGeneral.add(new BoolSetting.Builder()
@@ -129,6 +137,10 @@ public class BaritoneScript extends Module {
             toggle();
         }
 
+        if (!hasPickaxes()){
+            info("you ain't got no pickaxes dumbass");
+        }
+
         if (DTCheck.get() && !Modules.get().isActive(DiggingTools.class)) {
             info("DiggingTools isn't active, disabling.");
             baritone.getPathingBehavior().cancelEverything();
@@ -139,8 +151,6 @@ public class BaritoneScript extends Module {
         cornerThree = new BlockPos(cornerOne.get().getX(), cornerOne.get().getY(), cornerTwo.get().getZ());
         cornerFour = new BlockPos(cornerTwo.get().getX(), cornerOne.get().getY(), cornerOne.get().getZ());
 
-        //calculates the length of the distance the bot will be walking
-        dist = findDistance(cornerOne.get(),cornerThree,goalDir);
 
         isPaused = false;
 		currGoal = cornerThree;
@@ -158,6 +168,7 @@ public class BaritoneScript extends Module {
 		barPos = null;
 		currGoal = null;
         offsetting = false;
+        placedShulker = false;
         dist = 0;
     }
 
@@ -179,9 +190,11 @@ public class BaritoneScript extends Module {
         BlockPos currPlayerPos = mc.player.getBlockPos();
         int nukerOffset = nukerRange.get() * 2;
 
-        if (!hasItem() && !placedShulker) {
+        if (!hasPickaxes() && !placedShulker && getPickaxe.get()) {
             refilling = true;
-            BlockPos PlacePos = currPlayerPos.offset(goalDir);
+            baritone.getCommandManager().execute("pause");
+            BlockPos PlacePos = currPlayerPos.offset(goalDir.getOpposite());
+            if(modules.get(NFNuker.class).isActive())modules.get(NFNuker.class).toggle();
             placeRefillShulker(PlacePos);
             Vec3d lookVec = Vec3d.ofCenter(PlacePos, 1);
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(lookVec, Direction.UP, PlacePos, false));
@@ -220,6 +233,7 @@ public class BaritoneScript extends Module {
         }
 
         if (currPlayerPos.equals(offsetPos)) {
+            dist = findDistance(cornerOne.get(),cornerThree,goalDir);
             try {
                 goalDir = goalDir.getOpposite();
                 currGoal = new BlockPos(offsetPos.offset(goalDir,dist));
@@ -262,44 +276,10 @@ public class BaritoneScript extends Module {
 
 
     private void placeRefillShulker(BlockPos shulkerPlacePos){
-        int slot = findAndMoveToHotbar(itemStack -> itemStack.getItem() == Items.SHULKER_BOX);
-        BlockUtils.place(shulkerPlacePos, Hand.MAIN_HAND, slot, true, 0, true, true, false);
-
+        BlockUtils.place(shulkerPlacePos, Hand.MAIN_HAND, shulkerSlot.get(), true, 0, true, true, false);
     }
 
-    int findAndMoveToHotbar(Predicate<ItemStack> predicate) {
-        int slot = findSlot( predicate, true);
-        if (slot != -1) return slot;
-
-        int hotbarSlot = findHotbarSlot();
-
-        slot = findSlot(predicate, false);
-
-        // Move items from inventory to hotbar
-        InvUtils.move().from(slot).toHotbar(hotbarSlot);
-        InvUtils.dropHand();
-
-        return hotbarSlot;
-    }
-
-    private int findSlot(Predicate<ItemStack> predicate, boolean hotbar) {
-        for (int i = hotbar ? 0 : 9; i < (hotbar ? 9 : mc.player.getInventory().main.size()); i++) {
-            if (predicate.test(mc.player.getInventory().getStack(i))) return i;
-        }
-        return -1;
-    }
-
-    private int findHotbarSlot() {
-        for (int i = 0; i < 9; i++) {
-            ItemStack itemStack = mc.player.getInventory().getStack(i);
-            // Return if the slot is empty
-            if (itemStack.isEmpty()) return i;
-            // Return if the slot contains a tool and replacing tools is enabled
-        }
-        return -1;
-    }
-
-    private boolean hasItem() {
+    private boolean hasPickaxes() {
         for (int i = 0; i < mc.player.getInventory().main.size(); i++) {
             if (mc.player.getInventory().getStack(i).getItem() == Items.NETHERITE_PICKAXE) return true;
         }
