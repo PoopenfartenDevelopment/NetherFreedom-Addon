@@ -14,13 +14,14 @@ public class ArmorNotify extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Double> threshold = sgGeneral.add(new DoubleSetting.Builder()
-        .name("durability").description("How low an armor piece needs to be to alert you (in %).")
-        .defaultValue(10)
-        .min(1)
-        .sliderMin(1)
-        .sliderMax(100)
-        .max(100)
-        .build()
+            .name("durability")
+            .description("How low an armor piece needs to be to alert you (in %).")
+            .defaultValue(10)
+            .min(1)
+            .sliderMin(1)
+            .sliderMax(100)
+            .max(100)
+            .build()
     );
 
     public ArmorNotify() {

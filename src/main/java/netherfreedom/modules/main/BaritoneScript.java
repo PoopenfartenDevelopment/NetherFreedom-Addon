@@ -9,6 +9,7 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
@@ -65,6 +66,13 @@ public class BaritoneScript extends Module {
             .build()
     );
 
+    private final Setting<Boolean> DTCheck = sgGeneral.add(new BoolSetting.Builder()
+            .name("digging-tools-check")
+            .description("Disables itself if DiggingTools isn't on.")
+            .defaultValue(true)
+            .build()
+    );
+
     private final Setting<Boolean> renderCorners = sgGeneral.add(new BoolSetting.Builder()
             .name("render-corners")
             .description("renders the 2 corners.")
@@ -79,32 +87,35 @@ public class BaritoneScript extends Module {
             .build()
     );
 
+
     public BaritoneScript() {super(NetherFreedom.MAIN, "baritone-miner", "Allows you to mine while automatically. Use with DiggingTools.");}
+
+
     public BlockPos cornerThree, cornerFour;
     private BlockPos currGoal, barPos, offsetPos;
-    private Boolean offsetting, bindPressed, refilling = false;
-    private Boolean isPaused;
-    int dist = 0;
     Direction dirToOpposite, goalDir;
+    private boolean offsetting, bindPressed, refilling = false;
+    private boolean isPaused;
+    int dist = 0;
 
     @Override
     public void onActivate() {
-        // Makes sure the corners are at the same y-level
+        // Makes sure the corners are at the same y level
         if (cornerOne.get().getY() != cornerTwo.get().getY()) {
             info("Corners Y levels are not the same, disabling.");
             toggle();
         }
 
         // Needs fixing
-        /*if (!Modules.get().isActive(DiggingTools.class)) {
+        if (DTCheck.get() && !Modules.get().isActive(DiggingTools.class)) {
             info("DiggingTools isn't active, disabling.");
+            baritone.getPathingBehavior().cancelEverything();
             toggle();
-        }*/
+        }
 
         // Defines the 2 other corners to create a square based on the 2 positions the user defined
         cornerThree = new BlockPos(cornerOne.get().getX(), cornerOne.get().getY(), cornerTwo.get().getZ());
         cornerFour = new BlockPos(cornerTwo.get().getX(), cornerOne.get().getY(), cornerOne.get().getZ());
-
 
         isPaused = false;
 		currGoal = cornerThree;
@@ -126,7 +137,7 @@ public class BaritoneScript extends Module {
     }
 
     @EventHandler
-    private void onRender(Render3DEvent event){
+    private void onRender(Render3DEvent event) {
         if (renderCorners.get()) {
             try {
                 event.renderer.box(cornerOne.get(),Color.RED,Color.RED, ShapeMode.Both,0);
@@ -139,7 +150,7 @@ public class BaritoneScript extends Module {
     }
 
     @EventHandler
-    public void onTick(TickEvent.Pre event){
+    public void onTick(TickEvent.Pre event) {
         BlockPos currPlayerPos = mc.player.getBlockPos();
         int nukerOffset = nukerRange.get() * 2;
 

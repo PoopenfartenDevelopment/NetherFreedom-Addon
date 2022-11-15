@@ -4,8 +4,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
-import static meteordevelopment.meteorclient.MeteorClient.mc;
-
 public class NFUtils {
 
     // Armor Notify
@@ -15,10 +13,6 @@ public class NFUtils {
 
     public static double getDamage(ItemStack i) {
         return (((double) (i.getMaxDamage() - i.getDamage()) / i.getMaxDamage()) * 100);
-    }
-
-    public static ItemStack getArmor(int slot) {
-        return mc.player.getInventory().armor.get(slot);
     }
 
     public static boolean isHelm(ItemStack itemStack) {
