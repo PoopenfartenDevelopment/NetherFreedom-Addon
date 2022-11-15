@@ -190,7 +190,7 @@ public class BaritoneScript extends Module {
         if (currPlayerPos.equals(cornerOne.get())) {
             goalDir = findBlockDir(currPlayerPos,currGoal);
             barPos = new BlockPos(cornerOne.get().offset(goalDir));
-            dist = findDistance(currPlayerPos,currGoal,goalDir);
+            dist = findDistance(cornerOne.get(),cornerThree,goalDir);
         }
 
         if (!currPlayerPos.equals(barPos) && !offsetting && !refilling) {
@@ -211,8 +211,10 @@ public class BaritoneScript extends Module {
 
 
         if (currPlayerPos.equals(currGoal)) {
-            offsetPos = moveUpLine(currGoal,nukerOffset);
-            setGoal(offsetPos);
+            try{
+                offsetPos = moveUpLine(currGoal,nukerOffset);
+                setGoal(offsetPos);
+            }catch (Exception ignored){}
             offsetting = true;
         }
 
