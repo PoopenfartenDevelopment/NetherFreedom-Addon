@@ -139,6 +139,8 @@ public class BaritoneScript extends Module {
         cornerThree = new BlockPos(cornerOne.get().getX(), cornerOne.get().getY(), cornerTwo.get().getZ());
         cornerFour = new BlockPos(cornerTwo.get().getX(), cornerOne.get().getY(), cornerOne.get().getZ());
 
+        //calculates the length of the distance the bot will be walking
+        dist = findDistance(cornerOne.get(),cornerThree,goalDir);
 
         isPaused = false;
 		currGoal = cornerThree;
@@ -190,7 +192,6 @@ public class BaritoneScript extends Module {
         if (currPlayerPos.equals(cornerOne.get())) {
             goalDir = findBlockDir(currPlayerPos,currGoal);
             barPos = new BlockPos(cornerOne.get().offset(goalDir));
-            dist = findDistance(cornerOne.get(),cornerThree,goalDir);
         }
 
         if (!currPlayerPos.equals(barPos) && !offsetting && !refilling) {
