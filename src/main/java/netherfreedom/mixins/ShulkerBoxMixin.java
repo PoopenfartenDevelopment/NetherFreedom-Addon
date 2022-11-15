@@ -17,7 +17,6 @@ public abstract class ShulkerBoxMixin extends HandledScreen<ShulkerBoxScreenHand
     @Override
     protected void init() {
         super.init();
-
         BaritoneScript.steal(handler);
     }
 }

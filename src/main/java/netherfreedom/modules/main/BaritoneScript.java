@@ -33,6 +33,16 @@ import java.util.function.Predicate;
 
 public class BaritoneScript extends Module {
 
+    /*
+    todo:future features list
+        1.option for it to stop at certain goal position
+        2.option to disconnect on running out of pickaxes
+        3.designated shulker hotbar slot for refilling pickaxes
+        4(some day). swarm websocket integration
+        5.saves progress(probably not tho)
+    */
+
+
     private final IBaritone baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
     private final Settings baritoneSettings = BaritoneAPI.getSettings();
 
