@@ -4,6 +4,8 @@ import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
 import baritone.api.Settings;
 import baritone.api.pathing.goals.GoalBlock;
+import meteordevelopment.meteorclient.events.game.GameLeftEvent;
+import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
@@ -17,6 +19,7 @@ import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.item.Items;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
@@ -77,6 +80,13 @@ public class BaritoneScript extends Module {
             .build()
     );
 
+    private final Setting<Boolean> disableOnDisconnect = sgGeneral.add(new BoolSetting.Builder()
+        .name("disable-on-disconnect")
+        .description("Disables DiggingTools when you disconnect from a server.")
+        .defaultValue(true)
+        .build()
+    );
+
     private final Setting<Boolean> renderCorners = sgGeneral.add(new BoolSetting.Builder()
             .name("render-corners")
             .description("renders the 2 corners.")
@@ -99,8 +109,8 @@ public class BaritoneScript extends Module {
     );
 
     private final Setting<Integer> shulkerSlot = sgGeneral.add(new IntSetting.Builder()
-            .name("nuker-range")
-            .description("The first corner of the square where it will mine.")
+            .name("dedicated-shulker-slot")
+            .description("put a shulker in this slot and it will place the shulker to refill")
             .defaultValue(0)
             .range(0,9)
             .sliderRange(0,9)
@@ -124,27 +134,43 @@ public class BaritoneScript extends Module {
     int dist = 0;
     Direction dirToOpposite, goalDir;
 
+    @EventHandler
+    private void onScreenOpen(OpenScreenEvent event) {
+        if (disableOnDisconnect.get() && event.screen instanceof DisconnectedScreen) toggle();
+    }
+
+    @EventHandler
+    private void onGameLeft(GameLeftEvent event) {
+        if (disableOnDisconnect.get()) toggle();
+    }
+
     @Override
     public void onActivate() {
         // Makes sure the corners are at the same y-level
         if (cornerOne.get().getY() != cornerTwo.get().getY()) {
             info("Corners Y levels are not the same, disabling.");
+            baritone.getPathingBehavior().cancelEverything();
             toggle();
+            return;
         }
         if (cornerOne.get().equals(cornerTwo.get())){
             info("The corners are the same you monkey ");
             baritone.getPathingBehavior().cancelEverything();
             toggle();
+            return;
         }
 
         if (!hasPickaxes()){
             info("you ain't got no pickaxes dumbass");
+            baritone.getPathingBehavior().cancelEverything();
+            return;
         }
 
         if (DTCheck.get() && !Modules.get().isActive(DiggingTools.class)) {
             info("DiggingTools isn't active, disabling.");
             baritone.getPathingBehavior().cancelEverything();
             toggle();
+            return;
         }
 
         // Defines the 2 other corners to create a square based on the 2 positions the user defined
@@ -169,6 +195,7 @@ public class BaritoneScript extends Module {
 		currGoal = null;
         offsetting = false;
         placedShulker = false;
+        refilling = false;
         dist = 0;
     }
 
@@ -192,14 +219,14 @@ public class BaritoneScript extends Module {
 
         if (!hasPickaxes() && !placedShulker && getPickaxe.get()) {
             refilling = true;
+            info("ran out of pickaxes... refilling");
             baritone.getCommandManager().execute("pause");
-            BlockPos PlacePos = currPlayerPos.offset(goalDir.getOpposite());
+            BlockPos placePos = currPlayerPos.offset(goalDir.getOpposite());
             if(modules.get(NFNuker.class).isActive())modules.get(NFNuker.class).toggle();
-            placeRefillShulker(PlacePos);
-            Vec3d lookVec = Vec3d.ofCenter(PlacePos, 1);
-            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(lookVec, Direction.UP, PlacePos, false));
+            placeRefillShulker(placePos);
+            Vec3d lookVec = Vec3d.ofCenter(placePos, 1);
+            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(lookVec, Direction.UP, placePos, false));
             placedShulker = true;
-            return;
         }
 
         if (currPlayerPos.equals(cornerOne.get())) {
