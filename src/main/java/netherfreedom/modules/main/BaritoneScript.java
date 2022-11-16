@@ -13,16 +13,16 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
-import meteordevelopment.meteorclient.utils.network.MeteorExecutor;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
+import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
+import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -36,11 +36,11 @@ public class BaritoneScript extends Module {
 
     /*
     todo:future features list
-        1.option for it to stop at certain goal position
-        2.option to disconnect on running out of pickaxes
-        3.designated shulker hotbar slot for refilling pickaxes
-        4(some day). swarm websocket integration
-        5.saves progress(probably not tho)
+        1. option for it to stop at certain goal position
+        2. option to disconnect on running out of pickaxes
+        3. designated shulker hotbar slot for refilling pickaxes
+        4. swarm websocket integration(some day)
+        5. saves progress(probably not tho)
     */
 
 
@@ -129,7 +129,7 @@ public class BaritoneScript extends Module {
 
 
     public BlockPos cornerThree, cornerFour;
-    private BlockPos currGoal, barPos, offsetPos;
+    private BlockPos currGoal, barPos, offsetPos, placePos, savedPos;
     private boolean offsetting, bindPressed, refilling, isPaused, placedShulker = false;
     int dist = 0;
     Direction dirToOpposite, goalDir;
@@ -147,30 +147,18 @@ public class BaritoneScript extends Module {
     @Override
     public void onActivate() {
         // Makes sure the corners are at the same y-level
-        //todo: make a function for these errors
         if (cornerOne.get().getY() != cornerTwo.get().getY()) {
-            info("Corners Y levels are not the same, disabling.");
-            baritone.getPathingBehavior().cancelEverything();
-            toggle();
-            return;
-        }
-        if (cornerOne.get().equals(cornerTwo.get())){
-            info("The corners are the same you monkey ");
-            baritone.getPathingBehavior().cancelEverything();
-            toggle();
+            scriptError("Corners Y levels are not the same, disabling.");
             return;
         }
 
-        if (!hasPickaxes()){
-            info("you ain't got no pickaxes dumbass");
-            baritone.getPathingBehavior().cancelEverything();
+        if (cornerOne.get().equals(cornerTwo.get())){
+            scriptError("The corners are the same you monkey ");
             return;
         }
 
         if (DTCheck.get() && !Modules.get().isActive(DiggingTools.class)) {
-            info("DiggingTools isn't active, disabling.");
-            baritone.getPathingBehavior().cancelEverything();
-            toggle();
+            scriptError("DiggingTools isn't active, disabling.");
             return;
         }
 
@@ -178,6 +166,7 @@ public class BaritoneScript extends Module {
         cornerThree = new BlockPos(cornerOne.get().getX(), cornerOne.get().getY(), cornerTwo.get().getZ());
         cornerFour = new BlockPos(cornerTwo.get().getX(), cornerOne.get().getY(), cornerOne.get().getZ());
 
+        dirToOpposite = findBlockDir(cornerThree,cornerTwo.get());
 
         isPaused = false;
 		currGoal = cornerThree;
@@ -194,6 +183,8 @@ public class BaritoneScript extends Module {
         dirToOpposite = null;
 		barPos = null;
 		currGoal = null;
+        placePos = null;
+        savedPos = null;
         offsetting = false;
         placedShulker = false;
         refilling = false;
@@ -214,31 +205,58 @@ public class BaritoneScript extends Module {
     }
 
     @EventHandler
-    public void onTick(TickEvent.Pre event){
+    public void onTick(TickEvent.Pre event) throws InterruptedException {
         BlockPos currPlayerPos = mc.player.getBlockPos();
         int nukerOffset = nukerRange.get() * 2;
-        BlockPos placePos = null;
 
-        if (!hasPickaxes() && !placedShulker && getPickaxe.get()) {
+        if (notHavePickaxe() && !placedShulker && getPickaxe.get()) {
             refilling = true;
+            //saves the position of current baritone pathing goal to allow for regular pathing after it is done refilling
+            GoalBlock baritoneGoal = (GoalBlock) baritone.getCustomGoalProcess().getGoal();
+            savedPos = new BlockPos(baritoneGoal.x,baritoneGoal.y,baritoneGoal.z);
             info("ran out of pickaxes... refilling");
             baritone.getCommandManager().execute("pause");
-            placePos = currPlayerPos.offset(goalDir.getOpposite(),2);
-            if(modules.get(NFNuker.class).isActive())modules.get(NFNuker.class).toggle();
-            placeRefillShulker(placePos);
-            info("placing from slot" + shulkerSlot.get());
-            placedShulker = true;
+
+            //places 2 blocks away to make sure the player isn't in the way
+            placePos = currPlayerPos.offset(goalDir.getOpposite(), 2);
+
+            //disables nuker to keep it from mining the shulker
+            if (modules.get(NFNuker.class).isActive()) modules.get(NFNuker.class).toggle();
+
+            //places shulker
+            if (BlockUtils.place(placePos, Hand.MAIN_HAND, shulkerSlot.get(), true, 0, true, true, false)) {
+                placedShulker = true;
+            }
             return;
         }
 
-        if (!hasPickaxes() && placedShulker){
-            //todo make it steal the picks from the shulker
-            try{
-                Vec3d lookVec = Vec3d.ofCenter(placePos, 1);
-                mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(lookVec, Direction.UP, placePos, false));
-            }catch (Exception e){
-                info("fucked");
+        if (notHavePickaxe() && placedShulker) {
+            try {
+                //opens placed shulker box
+                mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(Vec3d.ofCenter(placePos, 1), Direction.UP, placePos, false));
+                //grabs all pickaxes from shulker box
+                if (mc.currentScreen instanceof ShulkerBoxScreen) {
+                    grabAllPickaxes();
+                }
+                //sets baritone goal to position of shulker to pick it up
+                setGoal(placePos);
+                baritone.getCommandManager().execute("resume");
+            } catch (Exception e) {
+                info(String.valueOf(e));
             }
+        }
+
+        if (currPlayerPos.equals(placePos)) {
+            //waits to allow time for the shulker box to be picked up
+            baritone.getCommandManager().execute("pause");
+            Thread.sleep(1000);
+            baritone.getCommandManager().execute("resume");
+            //resumes regular function
+            setGoal(savedPos);
+            refilling = false;
+            placedShulker = false;
+            placePos = null;
+            if (!modules.get(NFNuker.class).isActive()) modules.get(NFNuker.class).toggle();
         }
 
         if (currPlayerPos.equals(cornerOne.get())) {
@@ -262,10 +280,9 @@ public class BaritoneScript extends Module {
             setGoal(whatever);
         }
 
-
         if (currPlayerPos.equals(currGoal)) {
             try{
-                offsetPos = moveUpLine(currGoal,nukerOffset);
+                offsetPos = new BlockPos(currGoal.offset(dirToOpposite,nukerOffset));
                 setGoal(offsetPos);
             }catch (Exception ignored){}
             offsetting = true;
@@ -283,6 +300,7 @@ public class BaritoneScript extends Module {
         }
     }
 
+    //don't ask why there are 2 onTicks
     @EventHandler
     private void onTick(TickEvent.Post event) {
         if (!pauseBind.get().isPressed()) bindPressed = false;
@@ -300,7 +318,8 @@ public class BaritoneScript extends Module {
             bindPressed = true;
         }
     }
-    //bot pathing logic stuff
+
+    //places block underneath wear baritone is pathing
     private void placeUnder(BlockPos pos) {
         BlockPos under = new BlockPos(pos.offset(Direction.DOWN));
         if (mc.world.getBlockState(under).getMaterial().isReplaceable()) {
@@ -308,20 +327,19 @@ public class BaritoneScript extends Module {
         }
     }
 
+    //bot pathing logic
      private Direction findBlockDir(BlockPos originBlock, BlockPos goalBlock) {
+        //very bad this can very easily break if the 2 blocks positions are not inline with each other
         BlockPos vec = new BlockPos(Math.signum(goalBlock.getX() - originBlock.getX()),0, Math.signum(goalBlock.getZ() - originBlock.getZ()));
         return Direction.fromVector(vec);
     }
 
-    private BlockPos moveUpLine(BlockPos Pos, int nukerOffset) {
-        dirToOpposite= findBlockDir(cornerThree,cornerTwo.get());
-        return new BlockPos(Pos.offset(dirToOpposite,nukerOffset));
-    }
-
+    //do I really have to explain this
     private void setGoal(BlockPos goal){
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(goal));
     }
 
+    //extremely monkey way of finding distance between 2 blocks
     private int findDistance(BlockPos pos1, BlockPos pos2, Direction dir){
         int dist = 0;
         switch(dir){
@@ -335,30 +353,46 @@ public class BaritoneScript extends Module {
         return dist;
     }
 
-    //bot pickaxe refilling stuff
-    private void placeRefillShulker(BlockPos shulkerPlacePos){
-        BlockUtils.place(shulkerPlacePos, Hand.MAIN_HAND, shulkerSlot.get(), true, 0, true, true, false);
+    //reduce a bit of code rewriting
+    private void scriptError(String error){
+        info(error);
+        baritone.getPathingBehavior().cancelEverything();
+        toggle();
     }
 
-    private boolean hasPickaxes() {
+    //pickaxe refilling stuff
+    private boolean notHavePickaxe() {
         for (int i = 0; i < mc.player.getInventory().main.size(); i++) {
-            if (mc.player.getInventory().getStack(i).getItem() == Items.NETHERITE_PICKAXE) return true;
+            if (mc.player.getInventory().getStack(i).getItem() == Items.NETHERITE_PICKAXE) return false;
         }
-        return false;
+        return true;
     }
 
-    public static int getRows(ScreenHandler handler) {
-        return (handler instanceof GenericContainerScreenHandler ? ((GenericContainerScreenHandler) handler).getRows() : 3);
-    }
+    //double-clicks on slot if it has a pickaxe stops when it has only 1 slot available to leave room to pick up the shulker box
+    private void grabAllPickaxes(){
+        int picksMoved = 0;
+        int availableSlots = 0;
 
-    public static void moveSlots(ScreenHandler handler, int end) {
-        for (int i = 0; i < end; i++) {
-            if (!handler.getSlot(i).hasStack()) continue;
-            InvUtils.quickMove().slotId(i);
+        for (int i = 27; i < mc.player.currentScreenHandler.slots.size(); i++ ){
+            Item item = mc.player.currentScreenHandler.getSlot(i).getStack().getItem();
+            if(item.equals(Items.AIR)){
+                availableSlots++;
+            }
         }
+        info("availableSlots: " + availableSlots);
+
+        for (int i = 0; i < mc.player.currentScreenHandler.slots.size() - 36; i++) {
+            Item item = mc.player.currentScreenHandler.getSlot(i).getStack().getItem();
+            if(item.equals(Items.NETHERITE_PICKAXE)){
+                //do not fucking ask why
+                if(availableSlots - 2 > picksMoved){
+                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, i, 1, SlotActionType.QUICK_MOVE, mc.player);
+                    picksMoved++;
+                }else return;
+            }
+        }
+        info("picksMoved: " + picksMoved);
     }
 
-    public static void steal(ScreenHandler handler) {
-        MeteorExecutor.execute(() -> moveSlots(handler, getRows(handler) * 9));
-    }
+
 }
