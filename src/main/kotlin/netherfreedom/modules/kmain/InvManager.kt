@@ -18,47 +18,47 @@ class InvManager:MeteorModule(NetherFreedom.MAIN, "InvManager", "Automatically o
                                                "",
                                                "",
                                                { false },
-                                               { cur -> itemIds[0] = Identifier(cur).also { println("<HIGTools/InvManager> Loaded $it into slot0") } }))
+                                               { cur -> itemIds[0] = Identifier(cur).also { println("<NFClient/InvManager> Loaded $it into slot0") } }))
     private var slot1 by slotsGroup.add(SValue("Slot1",
                                                "",
                                                "",
                                                { false },
-                                               { cur -> itemIds[1] = Identifier(cur).also { println("<HIGTools/InvManager> Loaded $it into slot1") } }))
+                                               { cur -> itemIds[1] = Identifier(cur).also { println("<NFClient/InvManager> Loaded $it into slot1") } }))
     private var slot2 by slotsGroup.add(SValue("Slot2",
                                                "",
                                                "",
                                                { false },
-                                               { cur -> itemIds[2] = Identifier(cur).also { println("<HIGTools/InvManager> Loaded $it into slot2") } }))
+                                               { cur -> itemIds[2] = Identifier(cur).also { println("<NFClient/InvManager> Loaded $it into slot2") } }))
     private var slot3 by slotsGroup.add(SValue("Slot3",
                                                "",
                                                "",
                                                { false },
-                                               { cur -> itemIds[3] = Identifier(cur).also { println("<HIGTools/InvManager> Loaded $it into slot3") } }))
+                                               { cur -> itemIds[3] = Identifier(cur).also { println("<NFClient/InvManager> Loaded $it into slot3") } }))
     private var slot4 by slotsGroup.add(SValue("Slot4",
                                                "",
                                                "",
                                                { false },
-                                               { cur -> itemIds[4] = Identifier(cur).also { println("<HIGTools/InvManager> Loaded $it into slot4") } }))
+                                               { cur -> itemIds[4] = Identifier(cur).also { println("<NFClient/InvManager> Loaded $it into slot4") } }))
     private var slot5 by slotsGroup.add(SValue("Slot5",
                                                "",
                                                "",
                                                { false },
-                                               { cur -> itemIds[5] = Identifier(cur).also { println("<HIGTools/InvManager> Loaded $it into slot5") } }))
+                                               { cur -> itemIds[5] = Identifier(cur).also { println("<NFClient/InvManager> Loaded $it into slot5") } }))
     private var slot6 by slotsGroup.add(SValue("Slot6",
                                                "",
                                                "",
                                                { false },
-                                               { cur -> itemIds[6] = Identifier(cur).also { println("<HIGTools/InvManager> Loaded $it into slot6") } }))
+                                               { cur -> itemIds[6] = Identifier(cur).also { println("<NFClient/InvManager> Loaded $it into slot6") } }))
     private var slot7 by slotsGroup.add(SValue("Slot7",
                                                "",
                                                "",
                                                { false },
-                                               { cur -> itemIds[7] = Identifier(cur).also { println("<HIGTools/InvManager> Loaded $it into slot7") } }))
+                                               { cur -> itemIds[7] = Identifier(cur).also { println("<NFClient/InvManager> Loaded $it into slot7") } }))
     private var slot8 by slotsGroup.add(SValue("Slot8",
                                                "",
                                                "",
                                                { false },
-                                               { cur -> itemIds[8] = Identifier(cur).also { println("<HIGTools/InvManager> Loaded $it into slot8") } }))
+                                               { cur -> itemIds[8] = Identifier(cur).also { println("<NFClient/InvManager> Loaded $it into slot8") } }))
 
     private var delay by mainGroup.add(IValue("Delay", 1, "Delay in ticks between moving items.", 1..35, 1))
     private var reset by mainGroup.add(BValue("Reset", false, "Toggle this to reset, too lazy to make proper thing.", { true }, { reset() }))
@@ -68,7 +68,7 @@ class InvManager:MeteorModule(NetherFreedom.MAIN, "InvManager", "Automatically o
 
     override fun onActivate() {
         super.onActivate()
-        println("<HIGTools/InvManager> ${itemIds.contentToString()}")
+        println("<NFClient/InvManager> ${itemIds.contentToString()}")
     }
 
     @EventHandler
@@ -128,7 +128,7 @@ class InvManager:MeteorModule(NetherFreedom.MAIN, "InvManager", "Automatically o
         slot6 = Registry.ITEM.getId(mc.player!!.inventory.getStack(6).item).toString()
         slot7 = Registry.ITEM.getId(mc.player!!.inventory.getStack(7).item).toString()
         slot8 = Registry.ITEM.getId(mc.player!!.inventory.getStack(8).item).toString()
-        mc.inGameHud.chatHud.addMessage(Text.of("<${Formatting.LIGHT_PURPLE}HIGTools/InvManager${Formatting.RESET}> Saved inventory -> ${
+        mc.inGameHud.chatHud.addMessage(Text.of("<${Formatting.LIGHT_PURPLE}NFClient/InvManager${Formatting.RESET}> Saved inventory -> ${
             itemIds.contentToString().replace("minecraft:", "")
         }"))
     }
