@@ -81,10 +81,10 @@ public class BaritoneScript extends Module {
     );
 
     private final Setting<Boolean> disableOnDisconnect = sgGeneral.add(new BoolSetting.Builder()
-        .name("disable-on-disconnect")
-        .description("Disables DiggingTools when you disconnect from a server.")
-        .defaultValue(true)
-        .build()
+            .name("disable-on-disconnect")
+            .description("Disables DiggingTools when you disconnect from a server.")
+            .defaultValue(true)
+            .build()
     );
 
     private final Setting<Boolean> renderCorners = sgGeneral.add(new BoolSetting.Builder()
@@ -102,10 +102,10 @@ public class BaritoneScript extends Module {
     );
 
     private final Setting<Boolean> getPickaxe = sgGeneral.add(new BoolSetting.Builder()
-        .name("get-pickaxe-from-skulker")
-        .description("if it runs out of pickaxes it will get pickaxes from a shulker")
-        .defaultValue(true)
-        .build()
+            .name("get-pickaxe-from-skulker")
+            .description("if it runs out of pickaxes it will get pickaxes from a shulker")
+            .defaultValue(true)
+            .build()
     );
 
     private final Setting<Integer> shulkerSlot = sgGeneral.add(new IntSetting.Builder()
@@ -175,20 +175,20 @@ public class BaritoneScript extends Module {
         baritoneSettings.blockPlacementPenalty.value = 0.0;
         baritoneSettings.assumeWalkOnLava.value = true;
         baritoneSettings.allowPlace.value = true;
+        baritoneSettings.mineScanDroppedItems.value = true;
     }
 
     @Override
     public void onDeactivate() {
         baritone.getPathingBehavior().cancelEverything();
-        dirToOpposite = null;
-		barPos = null;
-		currGoal = null;
+        barPos = null;
         placePos = null;
         savedPos = null;
         offsetting = false;
         placedShulker = false;
         refilling = false;
         dist = 0;
+
     }
 
     @EventHandler
@@ -369,7 +369,7 @@ public class BaritoneScript extends Module {
     }
 
     //double-clicks on slot if it has a pickaxe stops when it has only 1 slot available to leave room to pick up the shulker box
-    private void grabAllPickaxes(){
+    private int grabAllPickaxes(){
         int picksMoved = 0;
         int availableSlots = 0;
 
@@ -388,11 +388,11 @@ public class BaritoneScript extends Module {
                 if(availableSlots - 2 > picksMoved){
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, i, 1, SlotActionType.QUICK_MOVE, mc.player);
                     picksMoved++;
-                }else return;
+                }
             }
         }
         info("picksMoved: " + picksMoved);
+        return picksMoved;
     }
-
 
 }
