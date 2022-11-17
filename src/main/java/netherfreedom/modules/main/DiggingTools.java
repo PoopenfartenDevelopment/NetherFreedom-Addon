@@ -10,7 +10,7 @@ import net.minecraft.client.gui.screen.DisconnectedScreen;
 import netherfreedom.modules.NetherFreedom;
 import netherfreedom.modules.kmain.AutoEatPlus;
 import netherfreedom.modules.kmain.NFNuker;
-import netherfreedom.modules.kmain.InvManager;
+import netherfreedom.modules.kmain.HotbarManager;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.misc.AutoLog;
@@ -47,7 +47,7 @@ public class DiggingTools extends Module {
         modules.get(AutoEatPlus.class).toggle();
         modules.get(AutoLog.class).toggle();
         modules.get(HandManager.class).toggle();
-        modules.get(InvManager.class).toggle();
+        modules.get(HotbarManager.class).toggle();
         modules.get(LiquidFiller.class).toggle();
         modules.get(NFNuker.class).toggle();
     }
@@ -62,8 +62,8 @@ public class DiggingTools extends Module {
             modules.get(AutoLog.class).toggle();
         if (modules.get(HandManager.class).isActive())
             modules.get(HandManager.class).toggle();
-        if (modules.get(InvManager.class).isActive())
-            modules.get(InvManager.class).toggle();
+        if (modules.get(HotbarManager.class).isActive())
+            modules.get(HotbarManager.class).toggle();
         if (modules.get(LiquidFiller.class).isActive())
             modules.get(LiquidFiller.class).toggle();
         if (modules.get(NFNuker.class).isActive())

@@ -48,7 +48,7 @@ public class NetherFreedom extends MeteorAddon {
         modules.add(new HandManager());
         modules.add(new RotationsPlus());
         // Main (Kotlin)
-        modules.add(new InvManager());
+        modules.add(new HotbarManager());
         modules.add(new NoCaveCulling());
         modules.add(new NFNuker());
         modules.add(AutoEatPlus.INSTANCE);
