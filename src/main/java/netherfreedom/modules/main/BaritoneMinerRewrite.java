@@ -101,16 +101,16 @@ public class BaritoneMinerRewrite extends Module {
     private Direction toEndOfLineDir, toAdvanceDir = null;
     private boolean offsetting = false;
     private boolean reachedStart = true;
-    private int dist = 0;
+    private int length,dist = 0;
 
     @Override
     public void onActivate() {
         currPlayerPos = mc.player.getBlockPos();
         BlockPos extrapolatePos = new BlockPos(cornerOne.get().getX(),cornerOne.get().getY(),cornerTwo.get().getZ());
         toEndOfLineDir = findBlockDir(cornerOne.get(),extrapolatePos);
-        dist = findDistance(cornerOne.get(),extrapolatePos, toEndOfLineDir);
+        length = findDistance(cornerOne.get(),extrapolatePos, toEndOfLineDir);
         toAdvanceDir = findBlockDir(extrapolatePos,cornerTwo.get());
-        endOfLinePos = currPlayerPos.offset(toEndOfLineDir,dist);
+        endOfLinePos = currPlayerPos.offset(toEndOfLineDir, length);
         barPos = currPlayerPos.offset(toEndOfLineDir,2);
         setGoal(barPos);
         if (enableDT.get()){
@@ -122,6 +122,8 @@ public class BaritoneMinerRewrite extends Module {
         if (pathToStart.get()){
             reachedStart = false;
             setGoal(cornerOne.get());
+        }else{
+            reachedStart = true;
         }
 
         baritoneSettings.blockPlacementPenalty.value = 0.0;
@@ -139,7 +141,7 @@ public class BaritoneMinerRewrite extends Module {
         toEndOfLineDir = null;
         toAdvanceDir = null;
         offsetting = false;
-        dist = 0;
+        length = 0;
         reachedStart = false;
 
         if (enableDT.get()){
@@ -162,18 +164,19 @@ public class BaritoneMinerRewrite extends Module {
             }
         }
 
-        if (currPlayerPos.equals(cornerOne)){
+        if (currPlayerPos.equals(cornerOne.get())){
             reachedStart = true;
         }
 
         if (!currPlayerPos.equals(barPos) && !offsetting && reachedStart) {
             try {
-                BlockPos preBarPos = new BlockPos(barPos.offset(toEndOfLineDir.getOpposite(),1));
+                BlockPos preBarPos = new BlockPos(barPos.offset(toEndOfLineDir.getOpposite()));
                 if (currPlayerPos.equals(preBarPos)) {
                     barPos = new BlockPos(barPos.offset(toEndOfLineDir));
                 }
                 setGoal(barPos);
                 placeUnder(barPos);
+                dist = findDistance(currPlayerPos,endOfLinePos,toEndOfLineDir);
             } catch (Exception ignored) {}
         }
 
@@ -195,7 +198,7 @@ public class BaritoneMinerRewrite extends Module {
         if (currPlayerPos.equals(offsetPos)) {
             info(String.valueOf(toEndOfLineDir));
             toEndOfLineDir = toEndOfLineDir.getOpposite();
-            endOfLinePos = new BlockPos(offsetPos.offset(toEndOfLineDir,dist));
+            endOfLinePos = new BlockPos(offsetPos.offset(toEndOfLineDir, length));
             barPos = new BlockPos(offsetPos.offset(toEndOfLineDir,2));
             offsetting = false;
             offsetPos = null;
@@ -210,8 +213,7 @@ public class BaritoneMinerRewrite extends Module {
         WHorizontalList b = list.add(theme.horizontalList()).expandX().widget();
         WButton start = b.add(theme.button("swap direction")).expandX().widget();
         start.action = () -> {
-            cornerOne.set(cornerOne.get().offset(toEndOfLineDir.getOpposite(),dist));
-            cornerTwo.set(cornerTwo.get().offset(toEndOfLineDir.getOpposite(),dist));
+            cornerTwo.set(cornerTwo.get().offset(toEndOfLineDir.getOpposite(), length*2));
         };
         return list;
     }
@@ -220,8 +222,9 @@ public class BaritoneMinerRewrite extends Module {
     private void onRender(Render3DEvent event){
         if (renderCorners.get()) {
             try {
+                Color DarkRed = new Color(139,0,0);
                 event.renderer.box(cornerOne.get(), Color.RED,Color.RED, ShapeMode.Both,0);
-                event.renderer.box(cornerTwo.get(),Color.RED,Color.RED, ShapeMode.Both,0);
+                event.renderer.box(cornerTwo.get(),DarkRed,DarkRed, ShapeMode.Both,0);
                 event.renderer.box(endOfLinePos,Color.BLUE,Color.BLUE,ShapeMode.Both,0);
             } catch(Exception ignored){}
         }
