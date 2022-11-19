@@ -29,11 +29,11 @@ public class NFAnnouncer extends Module {
         super(NetherFreedom.MAIN, "NFAnnouncer", "sends the amount of netherrack blocks you've broken in chat");
     }
 
-    private int count, ticks;
-    private int delayTicks = delay.get() * 20;
+    private int count, ticks, delayTicks;
 
     @Override
     public void onActivate(){
+        delayTicks = delay.get() * 20;
         count = 0;
         ticks = delayTicks;
     }
