@@ -47,6 +47,7 @@ public class NetherFreedom extends MeteorAddon {
         modules.add(new DiggingTools());
         modules.add(new DiscordRPC());
         modules.add(new HandManager());
+        modules.add(new NFAnnouncer());
         modules.add(new RotationsPlus());
         // Main (Kotlin)
         modules.add(new HotbarManager());
