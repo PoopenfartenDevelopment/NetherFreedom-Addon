@@ -73,6 +73,13 @@ public class BaritoneMinerRewrite extends Module {
             .build()
     );
 
+    private final Setting<Boolean> pathToStart = sgGeneral.add(new BoolSetting.Builder()
+            .name("path to start")
+            .description("paths to corner 1 before beginning")
+            .defaultValue(false)
+            .build()
+    );
+
     private final Setting<Boolean> enableDT = sgGeneral.add(new BoolSetting.Builder()
             .name("enable digging tools")
             .description("enables digging tools at the same time")
@@ -93,6 +100,7 @@ public class BaritoneMinerRewrite extends Module {
     private BlockPos endOfLinePos, barPos, offsetPos, currPlayerPos = null;
     private Direction toEndOfLineDir, toAdvanceDir = null;
     private boolean offsetting = false;
+    private boolean reachedStart = true;
     private int dist = 0;
 
     @Override
@@ -105,11 +113,15 @@ public class BaritoneMinerRewrite extends Module {
         endOfLinePos = currPlayerPos.offset(toEndOfLineDir,dist);
         barPos = currPlayerPos.offset(toEndOfLineDir,2);
         setGoal(barPos);
-
         if (enableDT.get()){
             if (!modules.isActive(DiggingTools.class)){
                 modules.get(DiggingTools.class).toggle();
             }
+        }
+
+        if (pathToStart.get()){
+            reachedStart = false;
+            setGoal(cornerOne.get());
         }
 
         baritoneSettings.blockPlacementPenalty.value = 0.0;
@@ -128,6 +140,7 @@ public class BaritoneMinerRewrite extends Module {
         toAdvanceDir = null;
         offsetting = false;
         dist = 0;
+        reachedStart = false;
 
         if (enableDT.get()){
             if (modules.isActive(DiggingTools.class)){
@@ -149,7 +162,11 @@ public class BaritoneMinerRewrite extends Module {
             }
         }
 
-        if (!currPlayerPos.equals(barPos) && !offsetting) {
+        if (currPlayerPos.equals(cornerOne)){
+            reachedStart = true;
+        }
+
+        if (!currPlayerPos.equals(barPos) && !offsetting && reachedStart) {
             try {
                 BlockPos preBarPos = new BlockPos(barPos.offset(toEndOfLineDir.getOpposite(),1));
                 if (currPlayerPos.equals(preBarPos)) {
@@ -191,12 +208,10 @@ public class BaritoneMinerRewrite extends Module {
         WVerticalList list = theme.verticalList();
 
         WHorizontalList b = list.add(theme.horizontalList()).expandX().widget();
-        WButton start = b.add(theme.button("Swap cor1 and cor2")).expandX().widget();
+        WButton start = b.add(theme.button("swap direction")).expandX().widget();
         start.action = () -> {
-            BlockPos temp = cornerOne.get();
-            cornerOne.set(cornerTwo.get());
-            cornerTwo.set(temp);
-            temp = null;
+            cornerOne.set(cornerOne.get().offset(toEndOfLineDir.getOpposite(),dist));
+            cornerTwo.set(cornerTwo.get().offset(toEndOfLineDir.getOpposite(),dist));
         };
         return list;
     }
