@@ -138,7 +138,6 @@ public class BaritoneMinerRewrite extends Module {
         endOfLinePos = null;
         barPos = null;
         offsetPos = null;
-        toEndOfLineDir = null;
         toAdvanceDir = null;
         offsetting = false;
         length = 0;
@@ -196,7 +195,6 @@ public class BaritoneMinerRewrite extends Module {
         }
 
         if (currPlayerPos.equals(offsetPos)) {
-            info(String.valueOf(toEndOfLineDir));
             toEndOfLineDir = toEndOfLineDir.getOpposite();
             endOfLinePos = new BlockPos(offsetPos.offset(toEndOfLineDir, length));
             barPos = new BlockPos(offsetPos.offset(toEndOfLineDir,2));
