@@ -183,7 +183,8 @@ public class BaritoneMinerRewrite extends Module {
             }
         }
         if (notHavePickaxe() && !placedShulker && getPickaxe.get()) {
-            baritone.getCommandManager().execute("pause");
+
+            if (baritone.getPathingBehavior().isPathing()) baritone.getCommandManager().execute("pause");
             refilling = true;
             GoalBlock baritoneGoal = (GoalBlock) baritone.getCustomGoalProcess().getGoal();
             savedPos = new BlockPos(baritoneGoal.x,baritoneGoal.y,baritoneGoal.z);
@@ -216,7 +217,7 @@ public class BaritoneMinerRewrite extends Module {
                 mc.currentScreen.close();
             }
             setGoal(shulkerPlacePos);
-            baritone.getCommandManager().execute("resume");
+            if (!baritone.getPathingBehavior().isPathing()) baritone.getCommandManager().execute("resume");
         }
 
         if (currPlayerPos.equals(shulkerPlacePos)) {
