@@ -220,6 +220,11 @@ public class BaritoneMinerRewrite extends Module {
         }
 
         if (currPlayerPos.equals(shulkerPlacePos)) {
+            //very monkey fix for right now
+            baritone.getCommandManager().execute("pause");
+            Thread.sleep(1000);
+            baritone.getCommandManager().execute("resume");
+
             setGoal(savedPos);
             shulkerPlacePos = null;
             savedPos = null;
