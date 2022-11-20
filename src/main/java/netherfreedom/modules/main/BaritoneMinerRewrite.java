@@ -220,13 +220,12 @@ public class BaritoneMinerRewrite extends Module {
         }
 
         if (currPlayerPos.equals(shulkerPlacePos)) {
-
-
             setGoal(savedPos);
             shulkerPlacePos = null;
             savedPos = null;
             placedShulker = false;
             refilling = false;
+            if (!modules.get(NFNuker.class).isActive()) modules.get(NFNuker.class).toggle();
         }
 
         if (!currPlayerPos.equals(barPos) && !offsetting && !refilling) {
