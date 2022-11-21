@@ -74,7 +74,7 @@ public class DiscordRPC extends Module {
     private final Setting<List<String>> line2Strings = sgLine2.add(new StringListSetting.Builder()
             .name("line-2-messages")
             .description("Messages used for the second line.")
-            .defaultValue("{player}", "Actively digging", "{server.player_count} Players online")
+            .defaultValue("have broken {player.get_stat(\"netherrack\",\"mined\")} netherrack", "Actively digging", "{server.player_count} Players online")
             .onChanged(strings -> recompileLine2())
             .build()
     );
