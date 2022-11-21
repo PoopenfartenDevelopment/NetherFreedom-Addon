@@ -4,6 +4,7 @@ import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
 import baritone.api.Settings;
 import baritone.api.pathing.goals.GoalBlock;
+import meteordevelopment.meteorclient.events.meteor.KeyEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.events.game.GameLeftEvent;
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
@@ -18,6 +19,7 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
+import meteordevelopment.meteorclient.utils.misc.input.KeyAction;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
@@ -76,13 +78,6 @@ public class BaritoneMinerRewrite extends Module {
             .build()
     );
 
-    private final Setting<Boolean> saveLineProgress = sgGeneral.add(new BoolSetting.Builder()
-            .name("save line progress")
-            .description("saves the progress on the current line you're digging")
-            .defaultValue(true)
-            .build()
-    );
-
     private final Setting<Boolean> renderCorners = sgGeneral.add(new BoolSetting.Builder()
             .name("render-corners")
             .description("renders the 2 corners.")
@@ -124,7 +119,7 @@ public class BaritoneMinerRewrite extends Module {
     private BlockPos endOfLinePos, barPos, offsetPos, currPlayerPos, shulkerPlacePos, savedPos = null;
     private Direction toEndOfLineDir, toAdvanceDir, shulkerPlaceDir = null;
     private boolean offsetting, refilling, placedShulker = false;
-    private int length,dist = 0;
+    private int length = 0;
 
     @Override
     public void onActivate() {
@@ -169,12 +164,12 @@ public class BaritoneMinerRewrite extends Module {
                 modules.get(DiggingTools.class).toggle();
             }
         }
-
     }
 
     @EventHandler
      public void onTick(TickEvent.Pre event) throws InterruptedException {
         currPlayerPos = mc.player.getBlockPos();
+
         if (pauseBind.get().isPressed()) {
             if(baritone.getPathingBehavior().isPathing()){
                 baritone.getCommandManager().execute("pause");
@@ -182,8 +177,8 @@ public class BaritoneMinerRewrite extends Module {
                 baritone.getCommandManager().execute("resume");
             }
         }
-        if (notHavePickaxe() && !placedShulker && getPickaxe.get()) {
 
+        if (notHavePickaxe() && !placedShulker && getPickaxe.get()) {
             if (baritone.getPathingBehavior().isPathing()) baritone.getCommandManager().execute("pause");
             refilling = true;
             GoalBlock baritoneGoal = (GoalBlock) baritone.getCustomGoalProcess().getGoal();
@@ -222,9 +217,9 @@ public class BaritoneMinerRewrite extends Module {
 
         if (currPlayerPos.equals(shulkerPlacePos)) {
             //very monkey fix for right now
-            baritone.getCommandManager().execute("pause");
+            if (!baritone.getPathingBehavior().isPathing()) baritone.getCommandManager().execute("pause");
             Thread.sleep(1000);
-            baritone.getCommandManager().execute("resume");
+            if (!baritone.getPathingBehavior().isPathing()) baritone.getCommandManager().execute("resume");
 
             setGoal(savedPos);
             shulkerPlacePos = null;
@@ -242,7 +237,6 @@ public class BaritoneMinerRewrite extends Module {
                 }
                 setGoal(barPos);
                 placeUnder(barPos);
-                dist = findDistance(currPlayerPos,endOfLinePos,toEndOfLineDir);
             } catch (Exception ignored) {}
         }
 
@@ -270,11 +264,9 @@ public class BaritoneMinerRewrite extends Module {
         }
     }
 
-
     @Override
     public WWidget getWidget(GuiTheme theme) {
         WVerticalList list = theme.verticalList();
-
         WHorizontalList b = list.add(theme.horizontalList()).expandX().widget();
         WButton start = b.add(theme.button("swap direction")).expandX().widget();
         start.action = () -> {
@@ -294,7 +286,21 @@ public class BaritoneMinerRewrite extends Module {
             } catch(Exception ignored){}
         }
     }
-     @EventHandler
+
+    @EventHandler
+    private void onKey(KeyEvent event){
+        if (pauseBind.get().getValue() == event.key) {
+            if (event.action == KeyAction.Release){
+                if(baritone.getPathingBehavior().isPathing()){
+                    baritone.getCommandManager().execute("pause");
+                }else{
+                    baritone.getCommandManager().execute("resume");
+                }
+            }
+        }
+    }
+
+    @EventHandler
     private void onScreenOpen(OpenScreenEvent event) {if (disableOnDisconnect.get() && event.screen instanceof DisconnectedScreen) toggle();}
 
     @EventHandler
@@ -313,6 +319,7 @@ public class BaritoneMinerRewrite extends Module {
             BlockUtils.place(under, InvUtils.findInHotbar(Blocks.NETHERRACK.asItem()),false,0);
         }
     }
+
     //do I really have to explain this
     private void setGoal(BlockPos goal){
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(goal));
@@ -332,7 +339,7 @@ public class BaritoneMinerRewrite extends Module {
         return dist;
     }
 
-//pickaxe refilling stuff
+    //pickaxe refilling stuff
     private boolean notHavePickaxe() {
         for (int i = 0; i < mc.player.getInventory().main.size(); i++) {
             if (mc.player.getInventory().getStack(i).getItem() == Items.NETHERITE_PICKAXE) return false;
@@ -340,7 +347,7 @@ public class BaritoneMinerRewrite extends Module {
         return true;
     }
 
-    //double-clicks on slot if it has a pickaxe stops when it has only 1 slot available to leave room to pick up the shulker box
+    //grabs pickaxes stops when it has only 1 slot available to leave room to pick up the shulker box
     private int grabAllPickaxes(){
         int picksMoved = 0;
         int availableSlots = 0;
