@@ -141,7 +141,6 @@ public class BaritoneMinerRewrite extends Module {
         }
         isPaused = false;
 
-        shulkerPlaceDir = toEndOfLineDir.getOpposite();
 
         baritoneSettings.blockPlacementPenalty.value = 0.0;
         baritoneSettings.assumeWalkOnLava.value = true;
@@ -163,6 +162,7 @@ public class BaritoneMinerRewrite extends Module {
     @EventHandler
      public void onTick(TickEvent.Pre event) throws InterruptedException {
         currPlayerPos = mc.player.getBlockPos();
+        shulkerPlaceDir = toEndOfLineDir.getOpposite();
 
         if (notHavePickaxe() && !placedShulker && getPickaxe.get()) {
             if (baritone.getPathingBehavior().isPathing()) baritone.getCommandManager().execute("pause");
