@@ -4,6 +4,7 @@ import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
 import baritone.api.Settings;
 import baritone.api.pathing.goals.GoalBlock;
+import meteordevelopment.meteorclient.events.entity.player.PickItemsEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.events.game.GameLeftEvent;
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
@@ -18,6 +19,7 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
+import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
@@ -34,8 +36,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import netherfreedom.modules.NetherFreedom;
-import netherfreedom.modules.kmain.HotbarManager;
 import netherfreedom.modules.kmain.NFNuker;
+import netherfreedom.utils.NFUtils;
 
 public class BaritoneMinerRewrite extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -65,15 +67,6 @@ public class BaritoneMinerRewrite extends Module {
             .defaultValue(8)
             .range(0,15)
             .sliderRange(1,15)
-            .build()
-    );
-
-    private final Setting<Integer> shulkerSlot = sgGeneral.add(new IntSetting.Builder()
-            .name("dedicated-shulker-slot")
-            .description("put a shulker in this slot and it will place the shulker to refill")
-            .defaultValue(0)
-            .range(0,9)
-            .sliderRange(0,9)
             .build()
     );
 
@@ -112,7 +105,7 @@ public class BaritoneMinerRewrite extends Module {
             .build()
     );
     public BaritoneMinerRewrite() {
-        super(NetherFreedom.MAIN, "BaritoneMinerRewrite", "this shit bugs me");
+        super(NetherFreedom.MAIN, "BaritoneMinerRewrite", "does the funni");
     }
 
     private BlockPos endOfLinePos, barPos, offsetPos, currPlayerPos, shulkerPlacePos, savedPos = null;
@@ -131,6 +124,7 @@ public class BaritoneMinerRewrite extends Module {
             endOfLinePos = currPlayerPos.offset(toEndOfLineDir, length);
             barPos = currPlayerPos.offset(toEndOfLineDir,2);
             defined = true;
+            shulkerPlaceDir = toEndOfLineDir.getOpposite();
         }
         setGoal(barPos);
 
@@ -162,21 +156,18 @@ public class BaritoneMinerRewrite extends Module {
     @EventHandler
      public void onTick(TickEvent.Pre event) throws InterruptedException {
         currPlayerPos = mc.player.getBlockPos();
-        shulkerPlaceDir = toEndOfLineDir.getOpposite();
 
-        if (notHavePickaxe() && !placedShulker && getPickaxe.get()) {
+        if (!NFUtils.haveItem(Items.NETHERITE_PICKAXE) && !placedShulker && getPickaxe.get()) {
             if (baritone.getPathingBehavior().isPathing()) baritone.getCommandManager().execute("pause");
             refilling = true;
             GoalBlock baritoneGoal = (GoalBlock) baritone.getCustomGoalProcess().getGoal();
             savedPos = new BlockPos(baritoneGoal.x,baritoneGoal.y,baritoneGoal.z);
-            info("ran out of pickaxes... refilling");
-            shulkerPlacePos = currPlayerPos.offset(shulkerPlaceDir, 2);
+            shulkerPlacePos = currPlayerPos.offset(shulkerPlaceDir,2);
             if (modules.get(NFNuker.class).isActive()) modules.get(NFNuker.class).toggle();
-            if (modules.get(HotbarManager.class).isActive()) modules.get(HotbarManager.class).toggle();
-            if (BlockUtils.place(shulkerPlacePos, Hand.MAIN_HAND, shulkerSlot.get() - 1 , true, 0, true, true, false)) {
+            if (BlockUtils.place(shulkerPlacePos, findShulkerBox(), true, 0, true, true, false)) {
                 placedShulker = true;
             } else {
-                info("unable to place... redirecting");
+                info("trying to place at" + shulkerPlacePos.getX() + " " + shulkerPlacePos.getZ());
                 shulkerPlaceDir = shulkerPlaceDir.rotateYClockwise();
                 placedShulker = false;
                 shulkerPlacePos = null;
@@ -185,9 +176,8 @@ public class BaritoneMinerRewrite extends Module {
             return;
         }
 
-        if (notHavePickaxe() && placedShulker) {
-            BlockHitResult bhr = new BlockHitResult(Vec3d.ofCenter(shulkerPlacePos, 1), Direction.UP, shulkerPlacePos, false);
-            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, bhr);
+        if (!NFUtils.haveItem(Items.NETHERITE_PICKAXE) && placedShulker) {
+            openShulker(shulkerPlacePos);
             if (mc.currentScreen instanceof ShulkerBoxScreen) {
                 if (grabAllPickaxes() == 0){
                     mc.currentScreen.close();
@@ -214,7 +204,6 @@ public class BaritoneMinerRewrite extends Module {
             placedShulker = false;
             refilling = false;
             if (!modules.get(NFNuker.class).isActive()) modules.get(NFNuker.class).toggle();
-            if (!modules.get(HotbarManager.class).isActive()) modules.get(HotbarManager.class).toggle();
         }
 
         if (!currPlayerPos.equals(barPos) && !offsetting && !refilling) {
@@ -235,15 +224,14 @@ public class BaritoneMinerRewrite extends Module {
 
 
         if (currPlayerPos.equals(endOfLinePos)) {
-            try {
-                offsetPos = new BlockPos(endOfLinePos.offset(toAdvanceDir, nukerOffset.get()));
-                setGoal(offsetPos);
-            } catch (Exception ignored) {}
+            offsetPos = new BlockPos(endOfLinePos.offset(toAdvanceDir, nukerOffset.get()));
+            setGoal(offsetPos);
             offsetting = true;
         }
 
         if (currPlayerPos.equals(offsetPos)) {
             toEndOfLineDir = toEndOfLineDir.getOpposite();
+            shulkerPlaceDir = toEndOfLineDir.getOpposite();
             endOfLinePos = new BlockPos(offsetPos.offset(toEndOfLineDir, length));
             barPos = new BlockPos(offsetPos.offset(toEndOfLineDir,2));
             offsetting = false;
@@ -307,9 +295,14 @@ public class BaritoneMinerRewrite extends Module {
         }
     }
 
+    //work in progress
+    @EventHandler
+    private void onPickUpItem(PickItemsEvent event){
+    }
+
+    //these toggle the module if you disconnect or leave the server
     @EventHandler
     private void onScreenOpen(OpenScreenEvent event) {if (disableOnDisconnect.get() && event.screen instanceof DisconnectedScreen) toggle();}
-
     @EventHandler
     private void onGameLeft(GameLeftEvent event) {if (disableOnDisconnect.get()) toggle();}
 
@@ -320,6 +313,7 @@ public class BaritoneMinerRewrite extends Module {
         return Direction.fromVector(vec);
     }
 
+    //places a block below the input
     private void placeUnder(BlockPos pos) {
         BlockPos under = new BlockPos(pos.offset(Direction.DOWN));
         if (mc.world.getBlockState(under).getMaterial().isReplaceable()) {
@@ -347,18 +341,23 @@ public class BaritoneMinerRewrite extends Module {
     }
 
     //pickaxe refilling stuff
-    private boolean notHavePickaxe() {
-        for (int i = 0; i < mc.player.getInventory().main.size(); i++) {
-            if (mc.player.getInventory().getStack(i).getItem() == Items.NETHERITE_PICKAXE) return false;
-        }
-        return true;
+    public FindItemResult findShulkerBox() {
+        FindItemResult shulker = InvUtils.find(itemStack -> NFUtils.Shulkers.contains(itemStack.getItem()));
+        return shulker;
+    }
+
+    private void openShulker(BlockPos sulkerPos) {
+        assert mc.interactionManager != null;
+        Vec3d shulkerVec = new Vec3d(sulkerPos.getX(), sulkerPos.getY(), sulkerPos.getZ());
+        BlockHitResult table = new BlockHitResult(shulkerVec, Direction.UP, sulkerPos, false);
+        mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, table);
     }
 
     //grabs pickaxes stops when it has only 1 slot available to leave room to pick up the shulker box
     private int grabAllPickaxes() {
         int picksMoved = 0;
         int availableSlots = 0;
-
+        //checks player's inventory for available slots
         for (int i = 27; i < mc.player.currentScreenHandler.slots.size(); i++ ) {
             Item item = mc.player.currentScreenHandler.getSlot(i).getStack().getItem();
             if (item.equals(Items.AIR)) {
@@ -367,10 +366,10 @@ public class BaritoneMinerRewrite extends Module {
         }
         info("availableSlots: " + availableSlots);
 
+        //checks shulker box for pickaxes and shift-clicks them stopping when there's 2 slots available
         for (int i = 0; i < mc.player.currentScreenHandler.slots.size() - 36; i++) {
             Item item = mc.player.currentScreenHandler.getSlot(i).getStack().getItem();
             if (item.equals(Items.NETHERITE_PICKAXE)) {
-                //do not fucking ask why
                 if (availableSlots - 2 > picksMoved) {
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, i, 1, SlotActionType.QUICK_MOVE, mc.player);
                     picksMoved++;
