@@ -86,22 +86,22 @@ public class BaritoneMinerRewrite extends Module {
     );
 
     private final Setting<Boolean> disableOnDisconnect = sgGeneral.add(new BoolSetting.Builder()
-            .name("disable on disconnect")
-            .description("disables when you disconnect")
+            .name("disable-on-disconnect")
+            .description("Disables when you disconnect.")
             .defaultValue(true)
             .build()
     );
 
     private final Setting<Boolean> getPickaxe = sgGeneral.add(new BoolSetting.Builder()
             .name("get-pickaxe-from-skulker")
-            .description("if it runs out of pickaxes it will get pickaxes from a shulker")
+            .description("Ff it runs out of pickaxes it will get pickaxes from a shulker.")
             .defaultValue(true)
             .build()
     );
 
     private final Setting<Boolean> enableDT = sgGeneral.add(new BoolSetting.Builder()
-            .name("enable digging tools")
-            .description("enables digging tools at the same time")
+            .name("enable-digging-tools")
+            .description("Enables digging tools at the same time.")
             .defaultValue(true)
             .build()
     );
@@ -118,7 +118,7 @@ public class BaritoneMinerRewrite extends Module {
 
     private BlockPos endOfLinePos, barPos, offsetPos, currPlayerPos, shulkerPlacePos, savedPos = null;
     private Direction toEndOfLineDir, toAdvanceDir, shulkerPlaceDir = null;
-    private boolean offsetting, refilling, placedShulker, defined = false;
+    private boolean offsetting, bindPressed, isPaused, refilling, placedShulker, defined = false;
     private int length = 0;
 
     @Override
@@ -140,6 +140,7 @@ public class BaritoneMinerRewrite extends Module {
                 modules.get(DiggingTools.class).toggle();
             }
         }
+        isPaused = false;
 
         shulkerPlaceDir = toEndOfLineDir.getOpposite();
 
@@ -164,14 +165,6 @@ public class BaritoneMinerRewrite extends Module {
      public void onTick(TickEvent.Pre event) throws InterruptedException {
         currPlayerPos = mc.player.getBlockPos();
 
-        if (pauseBind.get().isPressed()) {
-            if(baritone.getPathingBehavior().isPathing()){
-                baritone.getCommandManager().execute("pause");
-            }else{
-                baritone.getCommandManager().execute("resume");
-            }
-        }
-
         if (notHavePickaxe() && !placedShulker && getPickaxe.get()) {
             if (baritone.getPathingBehavior().isPathing()) baritone.getCommandManager().execute("pause");
             refilling = true;
@@ -182,7 +175,7 @@ public class BaritoneMinerRewrite extends Module {
             if (modules.get(NFNuker.class).isActive()) modules.get(NFNuker.class).toggle();
             if (BlockUtils.place(shulkerPlacePos, Hand.MAIN_HAND, shulkerSlot.get() - 1 , true, 0, true, true, false)) {
                 placedShulker = true;
-            }else{
+            } else {
                 info("unable to place... redirecting");
                 shulkerPlaceDir = shulkerPlaceDir.rotateYClockwise();
                 placedShulker = false;
@@ -258,6 +251,24 @@ public class BaritoneMinerRewrite extends Module {
         }
     }
 
+    @EventHandler
+    private void onTick(TickEvent.Post event) {
+        if (!pauseBind.get().isPressed()) bindPressed = false;
+
+        if (pauseBind.get().isPressed() && !bindPressed && !isPaused) {
+            baritone.getCommandManager().execute("pause");
+            isPaused = true;
+            bindPressed = true;
+            return;
+        }
+
+        if (pauseBind.get().isPressed() && !bindPressed && isPaused) {
+            baritone.getCommandManager().execute("resume");
+            isPaused = false;
+            bindPressed = true;
+        }
+    }
+
     @Override
     public WWidget getWidget(GuiTheme theme) {
         WVerticalList list = theme.verticalList();
@@ -285,7 +296,7 @@ public class BaritoneMinerRewrite extends Module {
     }
 
     @EventHandler
-    private void onRender(Render3DEvent event){
+    private void onRender(Render3DEvent event) {
         if (renderCorners.get()) {
             try {
                 Color DARKRED = new Color(139,0,0);
@@ -293,19 +304,6 @@ public class BaritoneMinerRewrite extends Module {
                 event.renderer.box(cornerTwo.get(),DARKRED,DARKRED, ShapeMode.Both,0);
                 event.renderer.box(endOfLinePos,Color.BLUE,Color.BLUE,ShapeMode.Both,0);
             } catch(Exception ignored){}
-        }
-    }
-
-    @EventHandler
-    private void onKey(KeyEvent event){
-        if (pauseBind.get().getValue() == event.key) {
-            if (event.action == KeyAction.Release){
-                if(baritone.getPathingBehavior().isPathing()){
-                    baritone.getCommandManager().execute("pause");
-                }else{
-                    baritone.getCommandManager().execute("resume");
-                }
-            }
         }
     }
 
@@ -335,9 +333,9 @@ public class BaritoneMinerRewrite extends Module {
     }
 
     //extremely monkey way of finding distance between 2 blocks
-    private int findDistance(BlockPos pos1, BlockPos pos2, Direction dir){
+    private int findDistance(BlockPos pos1, BlockPos pos2, Direction dir) {
         int dist = 0;
-        switch(dir){
+        switch(dir) {
             case EAST:
             case WEST:
                 dist = Math.abs(pos1.getX() - pos2.getX());
@@ -357,13 +355,13 @@ public class BaritoneMinerRewrite extends Module {
     }
 
     //grabs pickaxes stops when it has only 1 slot available to leave room to pick up the shulker box
-    private int grabAllPickaxes(){
+    private int grabAllPickaxes() {
         int picksMoved = 0;
         int availableSlots = 0;
 
-        for (int i = 27; i < mc.player.currentScreenHandler.slots.size(); i++ ){
+        for (int i = 27; i < mc.player.currentScreenHandler.slots.size(); i++ ) {
             Item item = mc.player.currentScreenHandler.getSlot(i).getStack().getItem();
-            if(item.equals(Items.AIR)){
+            if (item.equals(Items.AIR)) {
                 availableSlots++;
             }
         }
@@ -371,9 +369,9 @@ public class BaritoneMinerRewrite extends Module {
 
         for (int i = 0; i < mc.player.currentScreenHandler.slots.size() - 36; i++) {
             Item item = mc.player.currentScreenHandler.getSlot(i).getStack().getItem();
-            if(item.equals(Items.NETHERITE_PICKAXE)){
+            if (item.equals(Items.NETHERITE_PICKAXE)) {
                 //do not fucking ask why
-                if(availableSlots - 2 > picksMoved){
+                if (availableSlots - 2 > picksMoved) {
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, i, 1, SlotActionType.QUICK_MOVE, mc.player);
                     picksMoved++;
                 }
