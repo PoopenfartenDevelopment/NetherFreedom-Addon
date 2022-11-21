@@ -118,18 +118,21 @@ public class BaritoneMinerRewrite extends Module {
 
     private BlockPos endOfLinePos, barPos, offsetPos, currPlayerPos, shulkerPlacePos, savedPos = null;
     private Direction toEndOfLineDir, toAdvanceDir, shulkerPlaceDir = null;
-    private boolean offsetting, refilling, placedShulker = false;
+    private boolean offsetting, refilling, placedShulker, defined = false;
     private int length = 0;
 
     @Override
     public void onActivate() {
-        currPlayerPos = mc.player.getBlockPos();
-        BlockPos extrapolatePos = new BlockPos(cornerOne.get().getX(),cornerOne.get().getY(),cornerTwo.get().getZ());
-        toEndOfLineDir = findBlockDir(cornerOne.get(),extrapolatePos);
-        length = findDistance(cornerOne.get(),extrapolatePos, toEndOfLineDir);
-        toAdvanceDir = findBlockDir(extrapolatePos,cornerTwo.get());
-        endOfLinePos = currPlayerPos.offset(toEndOfLineDir, length);
-        barPos = currPlayerPos.offset(toEndOfLineDir,2);
+        if (!defined){
+            currPlayerPos = mc.player.getBlockPos();
+            BlockPos extrapolatePos = new BlockPos(cornerOne.get().getX(),cornerOne.get().getY(),cornerTwo.get().getZ());
+            toEndOfLineDir = findBlockDir(cornerOne.get(),extrapolatePos);
+            length = findDistance(cornerOne.get(),extrapolatePos, toEndOfLineDir);
+            toAdvanceDir = findBlockDir(extrapolatePos,cornerTwo.get());
+            endOfLinePos = currPlayerPos.offset(toEndOfLineDir, length);
+            barPos = currPlayerPos.offset(toEndOfLineDir,2);
+            defined = true;
+        }
         setGoal(barPos);
 
         if (enableDT.get()){
@@ -149,15 +152,6 @@ public class BaritoneMinerRewrite extends Module {
     @Override
     public void onDeactivate(){
         baritone.getPathingBehavior().cancelEverything();
-        endOfLinePos = null;
-        barPos = null;
-        offsetPos = null;
-        toAdvanceDir = null;
-        offsetting = false;
-        length = 0;
-        shulkerPlaceDir = toEndOfLineDir.getOpposite();
-        placedShulker = false;
-        refilling = false;
 
         if (enableDT.get()){
             if (modules.isActive(DiggingTools.class)){
@@ -186,7 +180,7 @@ public class BaritoneMinerRewrite extends Module {
             info("ran out of pickaxes... refilling");
             shulkerPlacePos = currPlayerPos.offset(shulkerPlaceDir, 2);
             if (modules.get(NFNuker.class).isActive()) modules.get(NFNuker.class).toggle();
-            if (BlockUtils.place(shulkerPlacePos, Hand.MAIN_HAND, shulkerSlot.get(), true, 0, true, true, false)) {
+            if (BlockUtils.place(shulkerPlacePos, Hand.MAIN_HAND, shulkerSlot.get() - 1 , true, 0, true, true, false)) {
                 placedShulker = true;
             }else{
                 info("unable to place... redirecting");
@@ -272,6 +266,21 @@ public class BaritoneMinerRewrite extends Module {
         start.action = () -> {
             cornerTwo.set(cornerTwo.get().offset(toEndOfLineDir.getOpposite(), length*2));
         };
+
+        WButton reset = b.add(theme.button("reset progress")).expandX().widget();
+        reset.action = () -> {
+            placedShulker = false;
+            refilling = false;
+            defined = false;
+            offsetting = false;
+            endOfLinePos = null;
+            barPos = null;
+            offsetPos = null;
+            toAdvanceDir = null;
+            length = 0;
+            shulkerPlaceDir = toEndOfLineDir.getOpposite();
+        };
+
         return list;
     }
 
