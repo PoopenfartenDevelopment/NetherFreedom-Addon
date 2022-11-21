@@ -4,7 +4,6 @@ import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
 import baritone.api.Settings;
 import baritone.api.pathing.goals.GoalBlock;
-import meteordevelopment.meteorclient.events.meteor.KeyEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.events.game.GameLeftEvent;
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
@@ -19,7 +18,6 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
-import meteordevelopment.meteorclient.utils.misc.input.KeyAction;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
@@ -36,6 +34,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import netherfreedom.modules.NetherFreedom;
+import netherfreedom.modules.kmain.HotbarManager;
 import netherfreedom.modules.kmain.NFNuker;
 
 public class BaritoneMinerRewrite extends Module {
@@ -173,6 +172,7 @@ public class BaritoneMinerRewrite extends Module {
             info("ran out of pickaxes... refilling");
             shulkerPlacePos = currPlayerPos.offset(shulkerPlaceDir, 2);
             if (modules.get(NFNuker.class).isActive()) modules.get(NFNuker.class).toggle();
+            if (modules.get(HotbarManager.class).isActive()) modules.get(HotbarManager.class).toggle();
             if (BlockUtils.place(shulkerPlacePos, Hand.MAIN_HAND, shulkerSlot.get() - 1 , true, 0, true, true, false)) {
                 placedShulker = true;
             } else {
@@ -214,6 +214,7 @@ public class BaritoneMinerRewrite extends Module {
             placedShulker = false;
             refilling = false;
             if (!modules.get(NFNuker.class).isActive()) modules.get(NFNuker.class).toggle();
+            if (!modules.get(HotbarManager.class).isActive()) modules.get(HotbarManager.class).toggle();
         }
 
         if (!currPlayerPos.equals(barPos) && !offsetting && !refilling) {
@@ -237,8 +238,7 @@ public class BaritoneMinerRewrite extends Module {
             try {
                 offsetPos = new BlockPos(endOfLinePos.offset(toAdvanceDir, nukerOffset.get()));
                 setGoal(offsetPos);
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
             offsetting = true;
         }
 
@@ -303,7 +303,7 @@ public class BaritoneMinerRewrite extends Module {
                 event.renderer.box(cornerOne.get(), Color.RED,Color.RED, ShapeMode.Both,0);
                 event.renderer.box(cornerTwo.get(),DARKRED,DARKRED, ShapeMode.Both,0);
                 event.renderer.box(endOfLinePos,Color.BLUE,Color.BLUE,ShapeMode.Both,0);
-            } catch(Exception ignored){}
+            } catch (Exception ignored) {}
         }
     }
 
