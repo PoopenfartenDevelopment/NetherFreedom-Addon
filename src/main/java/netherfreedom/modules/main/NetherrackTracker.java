@@ -22,11 +22,12 @@ public class NetherrackTracker extends Module {
     @Override
     public void onDeactivate(){
         finalAmount = getNetherrack();
-        int amount = initialAmount - finalAmount;
-        WHhandler.sendMessage(mc.player.getEntityName() + " mined " + -amount + " blocks of netherrack this session");
+        int amount = finalAmount - initialAmount;
+        WHhandler.sendMessage(mc.player.getEntityName() + " mined " + amount + " blocks of netherrack this session");
     }
 
     private int getNetherrack(){
+        //couldn't be bothered making getting stats myself
         Parser.Result result = Parser.parse("{player.get_stat(\"netherrack\",\"mined\")}");
         return Integer.parseInt(String.valueOf(MeteorStarscript.ss.run(Compiler.compile(result))));
     }
