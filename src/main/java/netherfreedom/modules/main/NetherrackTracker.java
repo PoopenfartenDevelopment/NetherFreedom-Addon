@@ -23,8 +23,10 @@ public class NetherrackTracker extends Module {
     }
 
     @Override
-    public void onDisable(){
+    public void onDeactivate(){
         finalAmount = getNetherrack();
+        int amount = initialAmount -finalAmount;
+        info("mined" + amount + "obsidian");
     }
 
     @EventHandler
