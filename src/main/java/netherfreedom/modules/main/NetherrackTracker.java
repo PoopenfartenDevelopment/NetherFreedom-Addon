@@ -1,14 +1,11 @@
 package netherfreedom.modules.main;
 
-import meteordevelopment.meteorclient.events.game.GameLeftEvent;
-import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.misc.MeteorStarscript;
-import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.starscript.compiler.Compiler;
 import meteordevelopment.starscript.compiler.Parser;
-import net.minecraft.client.gui.screen.DisconnectedScreen;
 import netherfreedom.modules.NetherFreedom;
+import netherfreedom.utils.WHhandler;
 
 public class NetherrackTracker extends Module {
 
@@ -25,18 +22,8 @@ public class NetherrackTracker extends Module {
     @Override
     public void onDeactivate(){
         finalAmount = getNetherrack();
-        int amount = initialAmount -finalAmount;
-        info("mined" + amount + "obsidian");
-    }
-
-    @EventHandler
-    private void onScreenOpen(OpenScreenEvent event) {
-
-    }
-
-    @EventHandler
-    private void onGameLeft(GameLeftEvent event) {
-
+        int amount = initialAmount - finalAmount;
+        WHhandler.sendMessage(mc.player.getEntityName() + " mined " + -amount + " blocks of netherrack this session");
     }
 
     private int getNetherrack(){
