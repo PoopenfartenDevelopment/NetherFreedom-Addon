@@ -164,15 +164,14 @@ public class BaritoneMinerRewrite extends Module {
             savedPos = new BlockPos(baritoneGoal.x,baritoneGoal.y,baritoneGoal.z);
             shulkerPlacePos = currPlayerPos.offset(shulkerPlaceDir,2);
             if (modules.get(NFNuker.class).isActive()) modules.get(NFNuker.class).toggle();
-            if (BlockUtils.place(shulkerPlacePos, findShulkerBox(), true, 0, true, true, false)) {
-                placedShulker = true;
-            } else {
+            if (!BlockUtils.place(shulkerPlacePos, findShulkerBox(), true, 0, true, true, false)) {
                 info("trying to place at" + shulkerPlacePos.getX() + " " + shulkerPlacePos.getZ());
                 shulkerPlaceDir = shulkerPlaceDir.rotateYClockwise();
                 placedShulker = false;
                 shulkerPlacePos = null;
                 return;
             }
+            placedShulker = true;
             return;
         }
 
@@ -342,8 +341,7 @@ public class BaritoneMinerRewrite extends Module {
 
     //pickaxe refilling stuff
     public FindItemResult findShulkerBox() {
-        FindItemResult shulker = InvUtils.find(itemStack -> NFUtils.Shulkers.contains(itemStack.getItem()));
-        return shulker;
+        return InvUtils.find(itemStack -> NFUtils.Shulkers.contains(itemStack.getItem()));
     }
 
     private void openShulker(BlockPos sulkerPos) {
