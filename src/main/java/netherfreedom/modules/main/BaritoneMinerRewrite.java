@@ -116,8 +116,8 @@ public class BaritoneMinerRewrite extends Module {
 
     private BlockPos endOfLinePos, barPos, offsetPos, currPlayerPos, shulkerPlacePos, savedPos = null;
     private Direction toEndOfLineDir, toAdvanceDir, shulkerPlaceDir = null;
-    private boolean offsetting, bindPressed, isPaused, refilling, placedShulker, defined,reachedStart = false;
-    private int length, initialNetherrack, initialPickAmount = 0;
+    private boolean offsetting, bindPressed, isPaused, refilling, placedShulker, defined= false;
+    private int length, initialNetherrack, initialPicksBroken = 0;
 
     @Override
     public void onActivate() {
@@ -137,7 +137,7 @@ public class BaritoneMinerRewrite extends Module {
         }
         isPaused = false;
 
-        initialPickAmount = getPickAmount();
+        initialPicksBroken = NFUtils.getPickaxesBroken();
         initialNetherrack = NFUtils.getNetherrack();
 
 
@@ -151,9 +151,12 @@ public class BaritoneMinerRewrite extends Module {
     public void onDeactivate(){
         baritone.getPathingBehavior().cancelEverything();
         int finalNetherrack = NFUtils.getNetherrack();
-        int finalPickAmount = getPickAmount();
+        int finalPickaxesBroken = NFUtils.getPickaxesBroken();
         info("Blocks Broken: %d", (finalNetherrack - initialNetherrack));
-        info("Pickaxes used: %d", -(finalPickAmount - initialPickAmount));
+        info("Pickaxes used: %d", (finalPickaxesBroken - initialPicksBroken));
+
+        if (modules.get(NetherrackTracker.class).isActive())
+            modules.get(NetherrackTracker.class).toggle();
 
         if (enableDT.get()){
             if (modules.isActive(DiggingTools.class)){
@@ -289,7 +292,6 @@ public class BaritoneMinerRewrite extends Module {
             offsetPos = null;
             toAdvanceDir = null;
             length = 0;
-            shulkerPlaceDir = toEndOfLineDir.getOpposite();
         };
 
         return list;
