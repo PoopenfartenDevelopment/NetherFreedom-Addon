@@ -69,6 +69,13 @@ public class BaritoneMinerRewrite extends Module {
             .build()
     );
 
+    private final Setting<Boolean> pathStart = sgGeneral.add(new BoolSetting.Builder()
+            .name("path-to-start")
+            .description("when activated baritone paths to corner one before starting")
+            .defaultValue(true)
+            .build()
+    );
+
     private final Setting<Boolean> renderCorners = sgGeneral.add(new BoolSetting.Builder()
             .name("render-corners")
             .description("renders the 2 corners.")
@@ -109,23 +116,19 @@ public class BaritoneMinerRewrite extends Module {
 
     private BlockPos endOfLinePos, barPos, offsetPos, currPlayerPos, shulkerPlacePos, savedPos = null;
     private Direction toEndOfLineDir, toAdvanceDir, shulkerPlaceDir = null;
-    private boolean offsetting, bindPressed, isPaused, refilling, placedShulker, defined = false;
+    private boolean offsetting, bindPressed, isPaused, refilling, placedShulker, defined,reachedStart = false;
     private int length, initialNetherrack, initialPickAmount = 0;
 
     @Override
     public void onActivate() {
-        if (!defined){
-            currPlayerPos = mc.player.getBlockPos();
-            BlockPos extrapolatePos = new BlockPos(cornerOne.get().getX(),cornerOne.get().getY(),cornerTwo.get().getZ());
-            toEndOfLineDir = findBlockDir(cornerOne.get(),extrapolatePos);
-            length = findDistance(cornerOne.get(),extrapolatePos, toEndOfLineDir);
-            toAdvanceDir = findBlockDir(extrapolatePos,cornerTwo.get());
-            endOfLinePos = currPlayerPos.offset(toEndOfLineDir, length);
-            barPos = currPlayerPos.offset(toEndOfLineDir,2);
-            defined = true;
-            shulkerPlaceDir = toEndOfLineDir.getOpposite();
+        if (!defined && !pathStart.get()){
+            start();
+        } else if (!defined && pathStart.get()) {
+            setGoal(cornerOne.get());
+        }else {
+            setGoal(barPos);
         }
-        setGoal(barPos);
+
 
         if (enableDT.get()){
             if (!modules.isActive(DiggingTools.class)){
@@ -162,6 +165,10 @@ public class BaritoneMinerRewrite extends Module {
     @EventHandler
      public void onTick(TickEvent.Pre event) throws InterruptedException {
         currPlayerPos = mc.player.getBlockPos();
+
+        if (pathStart.get() && currPlayerPos.equals(cornerOne.get())){
+            start();
+        }
 
         if (getPickAmount() == 0 && !placedShulker && getPickaxe.get()) {
             if (baritone.getPathingBehavior().isPathing()) baritone.getCommandManager().execute("pause");
@@ -307,6 +314,22 @@ public class BaritoneMinerRewrite extends Module {
     private void onGameLeft(GameLeftEvent event) {if (disableOnDisconnect.get()) toggle();}
 
      //bot pathing logic
+    private void start(){
+        currPlayerPos = mc.player.getBlockPos();
+        BlockPos extrapolatePos = new BlockPos(cornerOne.get().getX(),cornerOne.get().getY(),cornerTwo.get().getZ());
+        toEndOfLineDir = findBlockDir(cornerOne.get(),extrapolatePos);
+        length = findDistance(cornerOne.get(),extrapolatePos, toEndOfLineDir);
+        toAdvanceDir = findBlockDir(extrapolatePos,cornerTwo.get());
+        endOfLinePos = currPlayerPos.offset(toEndOfLineDir, length);
+        barPos = currPlayerPos.offset(toEndOfLineDir,2);
+        shulkerPlaceDir = toEndOfLineDir.getOpposite();
+        defined = true;
+
+        setGoal(barPos);
+    }
+
+
+
      private Direction findBlockDir(BlockPos originBlock, BlockPos goalBlock) {
         //very bad this can very easily break if the 2 blocks positions are not inline with each other
         BlockPos vec = new BlockPos(Math.signum(goalBlock.getX() - originBlock.getX()),0, Math.signum(goalBlock.getZ() - originBlock.getZ()));
