@@ -42,11 +42,9 @@ public class NetherFreedom extends MeteorAddon {
         modules.add(new ArmorNotify());
         modules.add(new AutoWalkPlus());
         modules.add(new BaritoneMinerRewrite());
-        modules.add(new ChatTweaks());
         modules.add(new DiggingTools());
         modules.add(new DiscordRPC());
         modules.add(new HandManager());
-        modules.add(new NetherrackTracker());
         modules.add(new NFAnnouncer());
         modules.add(new RotationsPlus());
         // Main (Kotlin)
