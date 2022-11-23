@@ -23,9 +23,9 @@ public class NetherrackTracker extends Module {
     public void onDeactivate(){
         finalAmount = getNetherrack();
         int amount = finalAmount - initialAmount;
-        WHhandler.sendMessage("'''"+mc.player.getEntityName() + " mined " + amount + " blocks of netherrack this session" + "'''");
+        if (amount > 1000){
+            WHhandler.sendMessage("```"+mc.player.getEntityName() + " mined " + amount + " blocks of netherrack this session" + "```");
+        }
     }
-
-
 
 }

