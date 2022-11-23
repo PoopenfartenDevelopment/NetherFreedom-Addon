@@ -155,9 +155,6 @@ public class BaritoneMinerRewrite extends Module {
         info("Blocks Broken: %d", (finalNetherrack - initialNetherrack));
         info("Pickaxes used: %d", (finalPickaxesBroken - initialPicksBroken));
 
-        if (modules.get(NetherrackTracker.class).isActive())
-            modules.get(NetherrackTracker.class).toggle();
-
         if (enableDT.get()){
             if (modules.isActive(DiggingTools.class)){
                 modules.get(DiggingTools.class).toggle();
