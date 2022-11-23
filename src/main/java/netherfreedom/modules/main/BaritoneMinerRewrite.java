@@ -4,7 +4,6 @@ import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
 import baritone.api.Settings;
 import baritone.api.pathing.goals.GoalBlock;
-import meteordevelopment.meteorclient.events.entity.player.PickItemsEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.events.game.GameLeftEvent;
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
@@ -111,7 +110,7 @@ public class BaritoneMinerRewrite extends Module {
     private BlockPos endOfLinePos, barPos, offsetPos, currPlayerPos, shulkerPlacePos, savedPos = null;
     private Direction toEndOfLineDir, toAdvanceDir, shulkerPlaceDir = null;
     private boolean offsetting, bindPressed, isPaused, refilling, placedShulker, defined = false;
-    private int length = 0;
+    private int length, initialNetherrack, initialPickAmount = 0;
 
     @Override
     public void onActivate() {
@@ -135,6 +134,9 @@ public class BaritoneMinerRewrite extends Module {
         }
         isPaused = false;
 
+        initialPickAmount = getPickAmount();
+        initialNetherrack = NFUtils.getNetherrack();
+
 
         baritoneSettings.blockPlacementPenalty.value = 0.0;
         baritoneSettings.assumeWalkOnLava.value = true;
@@ -145,6 +147,10 @@ public class BaritoneMinerRewrite extends Module {
     @Override
     public void onDeactivate(){
         baritone.getPathingBehavior().cancelEverything();
+        int finalNetherrack = NFUtils.getNetherrack();
+        int finalPickAmount = getPickAmount();
+        info("Blocks Broken: %d", (finalNetherrack - initialNetherrack));
+        info("Pickaxes used: %d", -(finalPickAmount - initialPickAmount));
 
         if (enableDT.get()){
             if (modules.isActive(DiggingTools.class)){
@@ -157,7 +163,7 @@ public class BaritoneMinerRewrite extends Module {
      public void onTick(TickEvent.Pre event) throws InterruptedException {
         currPlayerPos = mc.player.getBlockPos();
 
-        if (!NFUtils.haveItem(Items.NETHERITE_PICKAXE) && !placedShulker && getPickaxe.get()) {
+        if (getPickAmount() == 0 && !placedShulker && getPickaxe.get()) {
             if (baritone.getPathingBehavior().isPathing()) baritone.getCommandManager().execute("pause");
             refilling = true;
             GoalBlock baritoneGoal = (GoalBlock) baritone.getCustomGoalProcess().getGoal();
@@ -175,7 +181,7 @@ public class BaritoneMinerRewrite extends Module {
             return;
         }
 
-        if (!NFUtils.haveItem(Items.NETHERITE_PICKAXE) && placedShulker) {
+        if (getPickAmount() == 0 && placedShulker) {
             openShulker(shulkerPlacePos);
             if (mc.currentScreen instanceof ShulkerBoxScreen) {
                 if (grabAllPickaxes() == 0){
@@ -294,11 +300,6 @@ public class BaritoneMinerRewrite extends Module {
         }
     }
 
-    //work in progress
-    @EventHandler
-    private void onPickUpItem(PickItemsEvent event){
-    }
-
     //these toggle the module if you disconnect or leave the server
     @EventHandler
     private void onScreenOpen(OpenScreenEvent event) {if (disableOnDisconnect.get() && event.screen instanceof DisconnectedScreen) toggle();}
@@ -349,6 +350,10 @@ public class BaritoneMinerRewrite extends Module {
         Vec3d shulkerVec = new Vec3d(sulkerPos.getX(), sulkerPos.getY(), sulkerPos.getZ());
         BlockHitResult table = new BlockHitResult(shulkerVec, Direction.UP, sulkerPos, false);
         mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, table);
+    }
+
+    private int getPickAmount(){
+        return NFUtils.haveItem(Items.NETHERITE_PICKAXE);
     }
 
     //grabs pickaxes stops when it has only 1 slot available to leave room to pick up the shulker box

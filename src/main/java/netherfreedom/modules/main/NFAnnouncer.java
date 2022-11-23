@@ -1,15 +1,13 @@
 package netherfreedom.modules.main;
 
-import meteordevelopment.meteorclient.events.entity.player.BreakBlockEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.IntSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import netherfreedom.modules.NetherFreedom;
+import netherfreedom.utils.NFUtils;
 
 public class NFAnnouncer extends Module {
 
@@ -29,29 +27,25 @@ public class NFAnnouncer extends Module {
         super(NetherFreedom.MAIN, "NFAnnouncer", "sends the amount of netherrack blocks you've broken in chat");
     }
 
-    private int count, ticks, delayTicks;
+    private int initialCount;
+    private int ticks;
+    private int delayTicks = 0;
 
     @Override
     public void onActivate(){
         delayTicks = delay.get() * 20;
-        count = 0;
+        initialCount = NFUtils.getNetherrack();
         ticks = delayTicks;
-    }
 
-    @EventHandler
-    public void onBreakBlock(BreakBlockEvent event){
-        Block block = event.getBlockState(mc.world).getBlock();
-        if (block == Blocks.NETHERRACK){
-            count++;
-        }
     }
 
     @EventHandler
     public void onTick(TickEvent.Pre event){
+        int count = NFUtils.getNetherrack() - initialCount;
         if (ticks == 0 && count != 0) {
             mc.player.sendChatMessage("I just broke " + count + " blocks of netherrack With the power of NetherFreedom client", null);
             ticks = delayTicks;
-            count = 0;
+            this.initialCount = count;
         }
         ticks--;
     }

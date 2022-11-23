@@ -1,5 +1,8 @@
 package netherfreedom.utils;
 
+import meteordevelopment.meteorclient.utils.misc.MeteorStarscript;
+import meteordevelopment.starscript.compiler.Compiler;
+import meteordevelopment.starscript.compiler.Parser;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -43,12 +46,16 @@ public class NFUtils {
         return i == Items.NETHERITE_BOOTS || i == Items.DIAMOND_BOOTS || i == Items.GOLDEN_BOOTS || i == Items.IRON_BOOTS || i == Items.CHAINMAIL_BOOTS || i == Items.LEATHER_BOOTS;
     }
 
-   public static boolean haveItem(Item item) {
+   public static int haveItem(Item item) {
+        int count = 0;
         for (int i = 0; i < mc.player.getInventory().main.size(); i++) {
-            if (mc.player.getInventory().getStack(i).getItem() == item) return true;
+            if (mc.player.getInventory().getStack(i).getItem() == item){
+                count++;
+            }
         }
-        return false;
+        return count;
     }
+
     //honestly this is kinda embarrassing
    public static ArrayList<Item> Shulkers = new ArrayList<Item>(){{
         add(Items.WHITE_SHULKER_BOX);
@@ -68,4 +75,10 @@ public class NFUtils {
         add(Items.RED_SHULKER_BOX);
         add(Items.BLACK_SHULKER_BOX);
    }};
+
+    public static int getNetherrack(){
+        //couldn't be bothered making getting stats myself
+        Parser.Result result = Parser.parse("{player.get_stat(\"netherrack\",\"mined\")}");
+        return Integer.parseInt(String.valueOf(MeteorStarscript.ss.run(Compiler.compile(result))));
+    }
 }
