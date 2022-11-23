@@ -49,10 +49,6 @@ public class DiggingTools extends Module {
     public void onActivate() {
         Modules modules = Modules.get();
 
-        if (discordIntegrate.get()){
-            modules.get(NetherrackTracker.class).toggle();
-        }
-
         modules.get(AutoEatPlus.class).toggle();
         modules.get(AutoLog.class).toggle();
         modules.get(HandManager.class).toggle();
