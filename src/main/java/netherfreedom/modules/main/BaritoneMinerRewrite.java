@@ -39,6 +39,14 @@ import netherfreedom.modules.kmain.NFNuker;
 import netherfreedom.utils.NFUtils;
 
 public class BaritoneMinerRewrite extends Module {
+
+    /*
+    todo:future features list
+        1. option for it to stop at certain goal position
+        2. option to disconnect on running out of pickaxes
+        3. swarm websocket integration(some day)
+    */
+
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgShape = settings.createGroup("Shape");
 
@@ -114,6 +122,7 @@ public class BaritoneMinerRewrite extends Module {
         super(NetherFreedom.MAIN, "BaritoneMinerRewrite", "does the funni");
     }
 
+    //a global variable or two
     private BlockPos endOfLinePos, barPos, offsetPos, currPlayerPos, shulkerPlacePos, savedPos = null;
     private Direction toEndOfLineDir, toAdvanceDir, shulkerPlaceDir = null;
     private boolean offsetting, bindPressed, isPaused, refilling, placedShulker, defined= false;
@@ -135,11 +144,11 @@ public class BaritoneMinerRewrite extends Module {
                 modules.get(DiggingTools.class).toggle();
             }
         }
+
         isPaused = false;
 
         initialPicksBroken = NFUtils.getPickaxesBroken();
         initialNetherrack = NFUtils.getNetherrack();
-
 
         baritoneSettings.blockPlacementPenalty.value = 0.0;
         baritoneSettings.assumeWalkOnLava.value = true;
@@ -176,8 +185,11 @@ public class BaritoneMinerRewrite extends Module {
         if (getPickAmount() == 0 && !placedShulker && getPickaxe.get()) {
             if (baritone.getPathingBehavior().isPathing()) baritone.getCommandManager().execute("pause");
             refilling = true;
+            //saves bots current goal, so it can later resume after refilling on pickaxes
             GoalBlock baritoneGoal = (GoalBlock) baritone.getCustomGoalProcess().getGoal();
             savedPos = new BlockPos(baritoneGoal.x,baritoneGoal.y,baritoneGoal.z);
+
+            //places shulker and toggles nuker rotating and placing another shulker if the spot is invalid
             shulkerPlacePos = currPlayerPos.offset(shulkerPlaceDir,2);
             if (modules.get(NFNuker.class).isActive()) modules.get(NFNuker.class).toggle();
             if (!BlockUtils.place(shulkerPlacePos, findShulkerBox(), true, 0, true, true, false)) {
@@ -193,6 +205,7 @@ public class BaritoneMinerRewrite extends Module {
 
         if (getPickAmount() == 0 && placedShulker) {
             openShulker(shulkerPlacePos);
+            //if no pickaxes were moved then it will reset and place another shulker 90 degrees clockwise to the player
             if (mc.currentScreen instanceof ShulkerBoxScreen) {
                 if (grabAllPickaxes() == 0){
                     mc.currentScreen.close();
@@ -207,6 +220,7 @@ public class BaritoneMinerRewrite extends Module {
             if (!baritone.getPathingBehavior().isPathing()) baritone.getCommandManager().execute("resume");
         }
 
+        //breaks, paths, then pauses where the shulker was placed then resets to continue mining
         if (currPlayerPos.equals(shulkerPlacePos)) {
             //very monkey fix for right now
             if (!baritone.getPathingBehavior().isPathing()) baritone.getCommandManager().execute("pause");
@@ -221,13 +235,16 @@ public class BaritoneMinerRewrite extends Module {
             if (!modules.get(NFNuker.class).isActive()) modules.get(NFNuker.class).toggle();
         }
 
+        //the mode it will be working in most of the time.
         if (!currPlayerPos.equals(barPos) && !offsetting && !refilling) {
             try {
+                //if the player is one block before the goal then it will set the goal one further. this is to keep if from stuttering
                 BlockPos preBarPos = new BlockPos(barPos.offset(toEndOfLineDir.getOpposite()));
                 if (currPlayerPos.equals(preBarPos)) {
                     barPos = new BlockPos(barPos.offset(toEndOfLineDir));
                 }
                 setGoal(barPos);
+                //places a block under the goal to keep baritone from pulling any funny business
                 placeUnder(barPos);
             } catch (Exception ignored) {}
         }
@@ -272,6 +289,7 @@ public class BaritoneMinerRewrite extends Module {
         }
     }
 
+    //defines the buttons swap direction and hard reset button
     @Override
     public WWidget getWidget(GuiTheme theme) {
         WVerticalList list = theme.verticalList();
@@ -297,6 +315,7 @@ public class BaritoneMinerRewrite extends Module {
         return list;
     }
 
+    //renders the 3 blocks
     @EventHandler
     private void onRender(Render3DEvent event) {
         if (renderCorners.get()) {
@@ -317,6 +336,7 @@ public class BaritoneMinerRewrite extends Module {
 
      //bot pathing logic
     private void start(){
+        //ain't this just lovely to read
         currPlayerPos = mc.player.getBlockPos();
         BlockPos extrapolatePos = new BlockPos(cornerOne.get().getX(),cornerOne.get().getY(),cornerTwo.get().getZ());
         toEndOfLineDir = findBlockDir(cornerOne.get(),extrapolatePos);
@@ -331,7 +351,7 @@ public class BaritoneMinerRewrite extends Module {
     }
 
 
-
+    //finds the direction for one block to get to the other
      private Direction findBlockDir(BlockPos originBlock, BlockPos goalBlock) {
         //very bad this can very easily break if the 2 blocks positions are not inline with each other
         BlockPos vec = new BlockPos(Math.signum(goalBlock.getX() - originBlock.getX()),0, Math.signum(goalBlock.getZ() - originBlock.getZ()));
@@ -370,13 +390,14 @@ public class BaritoneMinerRewrite extends Module {
         return InvUtils.find(itemStack -> NFUtils.Shulkers.contains(itemStack.getItem()));
     }
 
+    //opens shulker
     private void openShulker(BlockPos sulkerPos) {
-        assert mc.interactionManager != null;
         Vec3d shulkerVec = new Vec3d(sulkerPos.getX(), sulkerPos.getY(), sulkerPos.getZ());
         BlockHitResult table = new BlockHitResult(shulkerVec, Direction.UP, sulkerPos, false);
         mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, table);
     }
 
+    //finds number of pickaxes in player inventory
     private int getPickAmount(){
         return NFUtils.haveItem(Items.NETHERITE_PICKAXE);
     }

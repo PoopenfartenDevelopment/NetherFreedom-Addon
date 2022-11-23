@@ -11,8 +11,8 @@ public class NetherrackTracker extends Module {
     public NetherrackTracker() {
         super(NetherFreedom.MAIN, "NetherrackTracker", "tracks the amount of netherrack mined and sends it to the discord chat");
     }
-    int initialAmount, finalAmount;
 
+    int initialAmount;
 
     @Override
     public void onActivate(){
@@ -21,7 +21,7 @@ public class NetherrackTracker extends Module {
 
     @Override
     public void onDeactivate(){
-        finalAmount = getNetherrack();
+        int finalAmount = getNetherrack();
         int amount = finalAmount - initialAmount;
         if (amount > 1000){
             WHhandler.sendMessage("```"+mc.player.getEntityName() + " mined " + amount + " blocks of netherrack this session" + "```");
