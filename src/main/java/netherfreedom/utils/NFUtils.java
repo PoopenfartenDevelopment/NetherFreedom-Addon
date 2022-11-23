@@ -81,4 +81,9 @@ public class NFUtils {
         Parser.Result result = Parser.parse("{player.get_stat(\"netherrack\",\"mined\")}");
         return Integer.parseInt(String.valueOf(MeteorStarscript.ss.run(Compiler.compile(result))));
     }
+
+    public static int getPickaxesBroken(){
+        Parser.Result result = Parser.parse("{player.get_stat(\"NETHERITE_PICKAXE\",\"broken\")}");
+        return Integer.parseInt(String.valueOf(MeteorStarscript.ss.run(Compiler.compile(result))));
+    }
 }
