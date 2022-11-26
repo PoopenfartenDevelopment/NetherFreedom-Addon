@@ -38,7 +38,7 @@ import netherfreedom.modules.NetherFreedom;
 import netherfreedom.modules.kmain.NFNuker;
 import netherfreedom.utils.NFUtils;
 
-public class BaritoneMinerRewrite extends Module {
+public class BaritoneMiner extends Module {
 
     /*
     todo:future features list
@@ -118,8 +118,8 @@ public class BaritoneMinerRewrite extends Module {
             .defaultValue(Keybind.none())
             .build()
     );
-    public BaritoneMinerRewrite() {
-        super(NetherFreedom.MAIN, "BaritoneMinerRewrite", "does the funni");
+    public BaritoneMiner() {
+        super(NetherFreedom.MAIN, "BaritoneMiner", "does the funni");
     }
 
     //a global variable or two
