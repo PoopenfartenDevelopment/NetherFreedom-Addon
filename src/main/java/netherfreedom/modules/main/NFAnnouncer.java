@@ -16,7 +16,7 @@ public class NFAnnouncer extends Module {
 
     private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
             .name("delay")
-            .description("delay in seconds between message sends (assumes 20 tps)")
+            .description("delay in ticks between message sends")
             .defaultValue(10)
             .range(1,100)
             .sliderRange(1,100)
@@ -29,14 +29,11 @@ public class NFAnnouncer extends Module {
 
     private int initialCount;
     private int ticks;
-    private int delayTicks = 0;
 
     @Override
     public void onActivate(){
-        delayTicks = delay.get() * 20;
         initialCount = NFUtils.getNetherrack();
-        ticks = delayTicks;
-
+        ticks = delay.get();
     }
 
     @EventHandler
@@ -44,8 +41,7 @@ public class NFAnnouncer extends Module {
         int count = NFUtils.getNetherrack() - initialCount;
         if (ticks == 0 && count != 0) {
             mc.player.sendChatMessage("I just broke " + count + " blocks of netherrack With the power of NetherFreedom client", null);
-            ticks = delayTicks;
-            this.initialCount = count;
+            initialCount = count;
         }
         ticks--;
     }
