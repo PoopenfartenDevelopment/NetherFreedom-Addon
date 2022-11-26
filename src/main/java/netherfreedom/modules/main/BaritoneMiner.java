@@ -144,6 +144,7 @@ public class BaritoneMiner extends Module {
                 modules.get(DiggingTools.class).toggle();
             }
         }
+
         isPaused = false;
 
         initialPicksBroken = NFUtils.getPickaxesBroken();
@@ -163,6 +164,9 @@ public class BaritoneMiner extends Module {
         int finalPickaxesBroken = NFUtils.getPickaxesBroken();
         info("Blocks Broken: %d", (finalNetherrack - initialNetherrack));
         info("Pickaxes used: %d", (finalPickaxesBroken - initialPicksBroken));
+
+        if (modules.get(NetherrackTracker.class).isActive())
+            modules.get(NetherrackTracker.class).toggle();
 
         if (enableDT.get()){
             if (modules.isActive(DiggingTools.class)){
@@ -195,13 +199,10 @@ public class BaritoneMiner extends Module {
                 placedShulker = false;
                 shulkerPlacePos = null;
                 return;
-
             }
             placedShulker = true;
             return;
         }
-
-
 
         if (getPickAmount() == 0 && placedShulker) {
             openShulker(shulkerPlacePos);
