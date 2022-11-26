@@ -26,13 +26,6 @@ public class DiggingTools extends Module {
         .build()
     );
 
-    private final Setting<Boolean> discordIntegrate = sgGeneral.add(new BoolSetting.Builder()
-        .name("discord-integrate")
-        .description("sends digging info to discord channel")
-        .defaultValue(true)
-        .build()
-    );
-
     public DiggingTools() { super(NetherFreedom.MAIN, "digging-tools", "Automatically toggles the necessary modules to dig."); }
 
     @EventHandler
