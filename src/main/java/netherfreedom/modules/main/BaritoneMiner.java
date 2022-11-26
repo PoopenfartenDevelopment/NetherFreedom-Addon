@@ -26,6 +26,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.SlotActionType;
@@ -239,6 +240,13 @@ public class BaritoneMiner extends Module {
         //the mode it will be working in most of the time.
         if (!currPlayerPos.equals(barPos) && !offsetting && !refilling) {
             try {
+                BlockPos underPos = barPos.offset(Direction.DOWN);
+                if (underPos.getY() == 120 && mc.world.getBlockState(underPos).getBlock() != Blocks.LAVA && mc.world.getBlockState(underPos).isAir()){
+                    barPos = underPos.offset(toEndOfLineDir);
+                } else if (mc.world.getBlockState(barPos).getBlock() == Blocks.LAVA){
+                    barPos = barPos.offset(Direction.UP);
+                }
+
                 //if the player is one block before the goal then it will set the goal one further. this is to keep if from stuttering
                 BlockPos preBarPos = new BlockPos(barPos.offset(toEndOfLineDir.getOpposite()));
                 if (currPlayerPos.equals(preBarPos)) {
@@ -246,13 +254,14 @@ public class BaritoneMiner extends Module {
                 }
                 setGoal(barPos);
                 //places a block under the goal to keep baritone from pulling any funny business
-                placeUnder(barPos);
+                if (underPos.getY() != cornerOne.get().getY()){
+                    placeUnder(barPos);
+                }
             } catch (Exception ignored) {}
         }
 
         if (currPlayerPos.equals(barPos)) {
-            BlockPos whatever = new BlockPos(barPos.offset(toEndOfLineDir.getOpposite()));
-            setGoal(whatever);
+            barPos = barPos.offset(toEndOfLineDir);
         }
 
         if (currPlayerPos.equals(endOfLinePos)) {
