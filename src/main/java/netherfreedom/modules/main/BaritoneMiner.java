@@ -194,7 +194,7 @@ public class BaritoneMiner extends Module {
             shulkerPlacePos = currPlayerPos.offset(shulkerPlaceDir,2);
             if (modules.get(NFNuker.class).isActive()) modules.get(NFNuker.class).toggle();
             if (!BlockUtils.place(shulkerPlacePos, findShulkerBox(), true, 0, true, true, false)) {
-                info("trying to place at" + shulkerPlacePos.getX() + " " + shulkerPlacePos.getZ());
+                info("Trying to place at " + shulkerPlacePos.getX() + " " + shulkerPlacePos.getZ());
                 shulkerPlaceDir = shulkerPlaceDir.rotateYClockwise();
                 placedShulker = false;
                 shulkerPlacePos = null;
