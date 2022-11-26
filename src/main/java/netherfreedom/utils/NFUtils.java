@@ -57,7 +57,7 @@ public class NFUtils {
     }
 
     //honestly this is kinda embarrassing
-   public static ArrayList<Item> Shulkers = new ArrayList<Item>(){{
+   public static ArrayList<Item> shulkers = new ArrayList<Item>(){{
         add(Items.WHITE_SHULKER_BOX);
         add(Items.ORANGE_SHULKER_BOX);
         add(Items.MAGENTA_SHULKER_BOX);

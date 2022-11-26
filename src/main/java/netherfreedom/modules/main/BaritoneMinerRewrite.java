@@ -100,7 +100,7 @@ public class BaritoneMinerRewrite extends Module {
 
     private final Setting<Boolean> getPickaxe = sgGeneral.add(new BoolSetting.Builder()
             .name("get-pickaxe-from-skulker")
-            .description("Ff it runs out of pickaxes it will get pickaxes from a shulker.")
+            .description("if it runs out of pickaxes it will get pickaxes from a shulker.")
             .defaultValue(true)
             .build()
     );
@@ -158,6 +158,7 @@ public class BaritoneMinerRewrite extends Module {
     @Override
     public void onDeactivate(){
         baritone.getPathingBehavior().cancelEverything();
+
         int finalNetherrack = NFUtils.getNetherrack();
         int finalPickaxesBroken = NFUtils.getPickaxesBroken();
         info("Blocks Broken: %d", (finalNetherrack - initialNetherrack));
@@ -194,10 +195,13 @@ public class BaritoneMinerRewrite extends Module {
                 placedShulker = false;
                 shulkerPlacePos = null;
                 return;
+
             }
             placedShulker = true;
             return;
         }
+
+
 
         if (getPickAmount() == 0 && placedShulker) {
             openShulker(shulkerPlacePos);
@@ -256,7 +260,6 @@ public class BaritoneMinerRewrite extends Module {
             setGoal(offsetPos);
             offsetting = true;
         }
-
         if (currPlayerPos.equals(offsetPos)) {
             toEndOfLineDir = toEndOfLineDir.getOpposite();
             shulkerPlaceDir = toEndOfLineDir.getOpposite();
@@ -382,7 +385,7 @@ public class BaritoneMinerRewrite extends Module {
 
     //pickaxe refilling stuff
     public FindItemResult findShulkerBox() {
-        return InvUtils.find(itemStack -> NFUtils.Shulkers.contains(itemStack.getItem()));
+        return InvUtils.find(itemStack -> NFUtils.shulkers.contains(itemStack.getItem()));
     }
 
     //opens shulker
@@ -423,4 +426,6 @@ public class BaritoneMinerRewrite extends Module {
         info("picksMoved: " + picksMoved);
         return picksMoved;
     }
+
+
 }
