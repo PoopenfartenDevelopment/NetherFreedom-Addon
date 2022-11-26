@@ -255,12 +255,12 @@ public class BaritoneMiner extends Module {
             setGoal(whatever);
         }
 
-
         if (currPlayerPos.equals(endOfLinePos)) {
             offsetPos = new BlockPos(endOfLinePos.offset(toAdvanceDir, nukerOffset.get()));
             setGoal(offsetPos);
             offsetting = true;
         }
+
         if (currPlayerPos.equals(offsetPos)) {
             toEndOfLineDir = toEndOfLineDir.getOpposite();
             shulkerPlaceDir = toEndOfLineDir.getOpposite();
@@ -294,23 +294,23 @@ public class BaritoneMiner extends Module {
     public WWidget getWidget(GuiTheme theme) {
         WVerticalList list = theme.verticalList();
         WHorizontalList b = list.add(theme.horizontalList()).expandX().widget();
-        WButton start = b.add(theme.button("swap direction")).expandX().widget();
-        start.action = () -> {
-            cornerTwo.set(cornerTwo.get().offset(toEndOfLineDir.getOpposite(), length*2));
-        };
 
         WButton reset = b.add(theme.button("reset progress")).expandX().widget();
         reset.action = () -> {
-            placedShulker = false;
-            refilling = false;
-            defined = false;
-            offsetting = false;
-            endOfLinePos = null;
-            barPos = null;
-            offsetPos = null;
-            toAdvanceDir = null;
-            length = 0;
-            shulkerPlaceDir = toEndOfLineDir.getOpposite();
+            try {
+                placedShulker = false;
+                refilling = false;
+                defined = false;
+                offsetting = false;
+                endOfLinePos = null;
+                barPos = null;
+                offsetPos = null;
+                toAdvanceDir = null;
+                length = 0;
+                shulkerPlaceDir = toEndOfLineDir.getOpposite();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         };
 
         return list;
