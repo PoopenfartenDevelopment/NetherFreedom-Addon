@@ -15,7 +15,7 @@ public class NFUtils {
 
     // Armor Notify
     public static boolean checkThreshold(ItemStack i, double threshold) {
-    return getDamage(i) <= threshold;
+        return getDamage(i) <= threshold;
     }
 
     public static double getDamage(ItemStack i) {
@@ -46,10 +46,10 @@ public class NFUtils {
         return i == Items.NETHERITE_BOOTS || i == Items.DIAMOND_BOOTS || i == Items.GOLDEN_BOOTS || i == Items.IRON_BOOTS || i == Items.CHAINMAIL_BOOTS || i == Items.LEATHER_BOOTS;
     }
 
-   public static int haveItem(Item item) {
+    public static int haveItem(Item item) {
         int count = 0;
         for (int i = 0; i < mc.player.getInventory().main.size(); i++) {
-            if (mc.player.getInventory().getStack(i).getItem() == item){
+            if (mc.player.getInventory().getStack(i).getItem() == item) {
                 count++;
             }
         }
@@ -57,24 +57,24 @@ public class NFUtils {
     }
 
     //honestly this is kinda embarrassing
-   public static ArrayList<Item> shulkers = new ArrayList<Item>(){{
-        add(Items.WHITE_SHULKER_BOX);
-        add(Items.ORANGE_SHULKER_BOX);
-        add(Items.MAGENTA_SHULKER_BOX);
-        add(Items.LIGHT_BLUE_SHULKER_BOX);
-        add(Items.YELLOW_SHULKER_BOX);
-        add(Items.LIME_SHULKER_BOX);
-        add(Items.PINK_SHULKER_BOX);
-        add(Items.GRAY_SHULKER_BOX);
-        add(Items.LIGHT_GRAY_SHULKER_BOX);
-        add(Items.CYAN_SHULKER_BOX);
-        add(Items.PURPLE_SHULKER_BOX);
-        add(Items.BLUE_SHULKER_BOX);
-        add(Items.BROWN_SHULKER_BOX);
-        add(Items.GREEN_SHULKER_BOX);
-        add(Items.RED_SHULKER_BOX);
-        add(Items.BLACK_SHULKER_BOX);
-   }};
+    public static ArrayList<Item> shulkers = new ArrayList<>(){{
+         add(Items.WHITE_SHULKER_BOX);
+         add(Items.ORANGE_SHULKER_BOX);
+         add(Items.MAGENTA_SHULKER_BOX);
+         add(Items.LIGHT_BLUE_SHULKER_BOX);
+         add(Items.YELLOW_SHULKER_BOX);
+         add(Items.LIME_SHULKER_BOX);
+         add(Items.PINK_SHULKER_BOX);
+         add(Items.GRAY_SHULKER_BOX);
+         add(Items.LIGHT_GRAY_SHULKER_BOX);
+         add(Items.CYAN_SHULKER_BOX);
+         add(Items.PURPLE_SHULKER_BOX);
+         add(Items.BLUE_SHULKER_BOX);
+         add(Items.BROWN_SHULKER_BOX);
+         add(Items.GREEN_SHULKER_BOX);
+         add(Items.RED_SHULKER_BOX);
+         add(Items.BLACK_SHULKER_BOX);
+    }};
 
     public static int getNetherrack(){
         //couldn't be bothered making getting stats myself

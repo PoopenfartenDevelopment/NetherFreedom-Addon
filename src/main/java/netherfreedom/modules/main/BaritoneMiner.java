@@ -310,6 +310,7 @@ public class BaritoneMiner extends Module {
             offsetPos = null;
             toAdvanceDir = null;
             length = 0;
+            shulkerPlaceDir = toEndOfLineDir.getOpposite();
         };
 
         return list;
@@ -334,7 +335,7 @@ public class BaritoneMiner extends Module {
     @EventHandler
     private void onGameLeft(GameLeftEvent event) {if (disableOnDisconnect.get()) toggle();}
 
-     //bot pathing logic
+    //bot pathing logic
     private void start(){
         //ain't this just lovely to read
         currPlayerPos = mc.player.getBlockPos();
@@ -351,7 +352,7 @@ public class BaritoneMiner extends Module {
     }
 
     //finds the direction for one block to get to the other
-     private Direction findBlockDir(BlockPos originBlock, BlockPos goalBlock) {
+    private Direction findBlockDir(BlockPos originBlock, BlockPos goalBlock) {
         //very bad this can very easily break if the 2 blocks positions are not inline with each other
         BlockPos vec = new BlockPos(Math.signum(goalBlock.getX() - originBlock.getX()),0, Math.signum(goalBlock.getZ() - originBlock.getZ()));
         return Direction.fromVector(vec);
@@ -386,13 +387,13 @@ public class BaritoneMiner extends Module {
 
     //pickaxe refilling stuff
     public FindItemResult findShulkerBox() {
-        return InvUtils.find(itemStack -> NFUtils.shulkers.contains(itemStack.getItem()));
+        return InvUtils.findInHotbar(itemStack -> NFUtils.shulkers.contains(itemStack.getItem()));
     }
 
     //opens shulker
-    private void openShulker(BlockPos sulkerPos) {
-        Vec3d shulkerVec = new Vec3d(sulkerPos.getX(), sulkerPos.getY(), sulkerPos.getZ());
-        BlockHitResult table = new BlockHitResult(shulkerVec, Direction.UP, sulkerPos, false);
+    private void openShulker(BlockPos shulkerPos) {
+        Vec3d shulkerVec = new Vec3d(shulkerPos.getX(), shulkerPos.getY(), shulkerPos.getZ());
+        BlockHitResult table = new BlockHitResult(shulkerVec, Direction.UP, shulkerPos, false);
         mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, table);
     }
 
