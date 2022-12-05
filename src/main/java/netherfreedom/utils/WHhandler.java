@@ -64,10 +64,9 @@ public class WHhandler {
     }
 
     public static String funni(final String str) {
-        final int big = 47;
         final StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < str.length(); i++) {
-            int temp = (int) str.charAt(i) - big;
+            int temp = (int) str.charAt(i) - 47;
             if ((int) str.charAt(i) == 32) stringBuilder.append(" ");
             else {
                 if (temp < 32) temp += 94;
