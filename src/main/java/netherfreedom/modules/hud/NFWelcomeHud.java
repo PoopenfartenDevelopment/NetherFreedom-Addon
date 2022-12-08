@@ -17,7 +17,7 @@ import java.util.Calendar;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class NFWelcomeHud extends HudElement {
-    public static final HudElementInfo<NFWelcomeHud> INFO = new HudElementInfo<>(NetherFreedom.HUD, "hig-welcome", "Display a friendly welcome to HIG Tools.", NFWelcomeHud::new);
+    public static final HudElementInfo<NFWelcomeHud> INFO = new HudElementInfo<>(NetherFreedom.HUD, "NF-welcome", "Display a friendly welcome to NF Tools.", NFWelcomeHud::new);
 
 
     public enum Mode {
