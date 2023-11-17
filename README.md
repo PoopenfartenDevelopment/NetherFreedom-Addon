@@ -1,14 +1,14 @@
 <div align="center">
   <!-- Logo and Title -->
-  <img src="/src/main/resources/assets/netherfreedom/icon.png" alt="logo" width="20%"/>
-  <h1>Nether Freedom Client</h1>
-  <p>Nether Freedom Client is specifically to dig the nether freedom project on endcrystal.me</p>
+  <img src="/src/main/resources/assets/icon.png" alt="logo" width="20%"/>
+  <h1>Nether Freedom Addon</h1>
+  <p>Nether Freedom Addon is specifically to dig the nether freedom project on endcrystal.me</p>
 
   <!-- Fancy badges -->
   <a href="https://anticope.ml/pages/MeteorAddons.html"><img src="https://img.shields.io/badge/Verified%20Addon-Not Yet :(-blueviolet" alt="Verified Addon"></a>
-  <a href="https://github.com/PoopenfartenDevelopment/NetherFreedom-Client/releases/tag/latest"><img src="https://img.shields.io/badge/Version-v1.3-blueviolet" alt="Version"></a>
-  <img src="https://img.shields.io/badge/Minecraft%20Version-1.19.2-blueviolet" alt="Minecraft Version">
-  <img src="https://img.shields.io/github/downloads/RedCarlos26/NetherFreedom-Client/total?color=blueviolet&label=Downloads">
+  <a href="https://github.com/PoopenfartenDevelopment/NetherFreedom-Addon/releases/tag/latest"><img src="https://img.shields.io/badge/Version-v1.4-blueviolet" alt="Version"></a>
+  <img src="https://img.shields.io/badge/Minecraft%20Version-1.20.2-blueviolet" alt="Minecraft Version">
+  <img src="https://img.shields.io/github/downloads/RedCarlos26/NetherFreedom-Addon/total?color=blueviolet&label=Downloads">
 </div>
 
 <div align="center">
@@ -17,30 +17,22 @@
 
 # How to use
 - Download the lastest Meteor Client DevBuild.
-- Put NF Client in your `.minecraft/mods` folder where you have installed Meteor.
-- Keep in mind that you need Fabric Kotlin API to load NF Client. Download it here: [Fabric Kotlin Page](https://www.curseforge.com/minecraft/mc-mods/fabric-language-kotlin/files/all?filter-game-version=2020709689%3A9366)
+- Put NF Addon in your `.minecraft/mods` folder where you have installed Meteor.
 
 # Features
 ## Modules
 - AfkLogout
 - ArmorNotify
-- Aura
-- AutoEat+
 - AutoWalk+
 - BaritoneMiner
-- ChatTweaks
 - DiggingTools
 - DiscordRPC
 - HandManager
-- InvManager
-- NFNuker
-- NoCaveCulling
-- Rotations+
-- Scaffold+
+- HotbarManager
+- NFBorer
+- NFRotation
+- NFScaffold
 
 ## HUD
 - Binds HUD
 - Welcome HUD
-
-## Commands
-- `.disconnect`
