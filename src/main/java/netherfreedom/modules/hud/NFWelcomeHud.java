@@ -1,100 +1,49 @@
 package netherfreedom.modules.hud;
 
-import netherfreedom.modules.NetherFreedom;
 import meteordevelopment.meteorclient.settings.EnumSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
-import meteordevelopment.meteorclient.settings.StringSetting;
 import meteordevelopment.meteorclient.systems.hud.HudElement;
 import meteordevelopment.meteorclient.systems.hud.HudElementInfo;
 import meteordevelopment.meteorclient.systems.hud.HudRenderer;
 import meteordevelopment.meteorclient.systems.hud.elements.TextHud;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.misc.NameProtect;
+import netherfreedom.NetherFreedom;
 
 import java.util.Calendar;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class NFWelcomeHud extends HudElement {
-    public static final HudElementInfo<NFWelcomeHud> INFO = new HudElementInfo<>(NetherFreedom.HUD, "NF-welcome", "Display a friendly welcome to NF Tools.", NFWelcomeHud::new);
-
-
-    public enum Mode {
-        Normal,
-        Custom
-    }
-
+    public static final HudElementInfo<NFWelcomeHud> INFO = new HudElementInfo<>(NetherFreedom.Hud, "welcome-hud", "Displays a friendly welcome.", NFWelcomeHud::new);
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
-
-    // General
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
         .name("mode")
         .description("What text to show for the greeting.")
-        .defaultValue(Mode.Normal)
+        .defaultValue(Mode.Time)
         .build()
     );
 
-    private final Setting<String> morningGreeting = sgGeneral.add(new StringSetting.Builder()
-        .name("morning-greeting")
-        .description("What to display as a greeting during morning hours.")
-        .defaultValue("Good Morning")
-        .visible(() -> mode.get() == Mode.Normal)
-        .build()
-    );
-
-    private final Setting<String> afternoonGreeting = sgGeneral.add(new StringSetting.Builder()
-        .name("afternoon-greeting")
-        .description("What to display as a greeting during afternoon hours.")
-        .defaultValue("Good Afternoon")
-        .visible(() -> mode.get() == Mode.Normal)
-        .build()
-    );
-
-    private final Setting<String> eveningGreeting = sgGeneral.add(new StringSetting.Builder()
-        .name("evening-greeting")
-        .description("What to display as a greeting during evening hours.")
-        .defaultValue("Good Evening")
-        .visible(() -> mode.get() == Mode.Normal)
-        .build()
-    );
-
-    private final Setting<String> customGreeting = sgGeneral.add(new StringSetting.Builder()
-        .name("custom-greeting")
-        .description("What the greeting should say.")
-        .defaultValue("Welcome to NF Client")
-        .visible(() -> mode.get() == Mode.Custom)
-        .build()
-    );
-
+    private String leftText;
+    private String rightText;
+    private double leftWidth;
 
     public NFWelcomeHud() {
         super(INFO);
     }
 
-
-    private String leftText;
-    private String rightText;
-
-    private double leftWidth;
-
-
     @Override
     public void tick(HudRenderer renderer) {
-        Calendar calendar = Calendar.getInstance();
-        int localTime = calendar.get(Calendar.HOUR_OF_DAY);
+        int localTime = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
 
-        if (mode.get() == Mode.Custom) {
-            leftText = customGreeting.get();
-        } else {
-            if (localTime <= 12) leftText = morningGreeting.get();
-            if (localTime >= 13 && localTime <= 16) leftText = afternoonGreeting.get();
-            if (localTime >= 17) leftText = eveningGreeting.get();
-        }
+        if (mode.get() == Mode.NetherFreedom) leftText = "Welcome to NF Client, ";
+        else if (localTime <= 12) leftText = "Good Morning, ";
+        else if (localTime <= 16) leftText = "Good Afternoon, ";
+        else leftText = "Good Evening, ";
 
-        leftText = leftText + ", ";
         rightText = Modules.get().get(NameProtect.class).getName(mc.getSession().getUsername());
 
         leftWidth = renderer.textWidth(leftText);
@@ -109,11 +58,16 @@ public class NFWelcomeHud extends HudElement {
         double y = this.y;
 
         if (isInEditor()) {
-            renderer.text("NF Welcome", x, y, TextHud.getSectionColor(0), true);
+            renderer.text("NFWelcome", x, y, TextHud.getSectionColor(0), true);
             return;
         }
 
         renderer.text(leftText, x, y, TextHud.getSectionColor(0), true);
         renderer.text(rightText, x + leftWidth, y, TextHud.getSectionColor(1), true);
+    }
+
+    public enum Mode {
+        NetherFreedom,
+        Time
     }
 }

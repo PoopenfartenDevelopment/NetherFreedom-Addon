@@ -1,19 +1,28 @@
+/*
+ * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+ * Copyright (c) Meteor Development.
+ * Enhanced by RedCarlos26
+ */
+
 package netherfreedom.modules.main;
 
-import netherfreedom.modules.NetherFreedom;
+import meteordevelopment.meteorclient.events.game.GameLeftEvent;
+import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
+import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.misc.input.Input;
-import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.orbit.EventHandler;
-
+import net.minecraft.client.gui.screen.DisconnectedScreen;
+import netherfreedom.NetherFreedom;
 import org.lwjgl.glfw.GLFW;
 
-public class RotationsPlus extends Module {
+public class NFRotation extends Module {
     private final SettingGroup sgYaw = settings.createGroup("Yaw");
     private final SettingGroup sgPitch = settings.createGroup("Pitch");
 
     // Yaw
+
     private final Setting<LockMode> yawLockMode = sgYaw.add(new EnumSetting.Builder<LockMode>()
         .name("yaw-lock-mode")
         .description("The way in which your yaw is locked.")
@@ -27,10 +36,19 @@ public class RotationsPlus extends Module {
         .defaultValue(0)
         .sliderMax(360)
         .max(360)
+        .visible(() -> yawLockMode.get() == LockMode.Simple)
+        .build()
+    );
+
+    private final Setting<Boolean> arrowSnap = sgYaw.add(new BoolSetting.Builder()
+        .name("arrows-snap")
+        .description("Snap your player at 45° steps with the arrow keys.")
+        .visible(() -> yawLockMode.get() != LockMode.None)
         .build()
     );
 
     // Pitch
+
     private final Setting<LockMode> pitchLockMode = sgPitch.add(new EnumSetting.Builder<LockMode>()
         .name("pitch-lock-mode")
         .description("The way in which your pitch is locked.")
@@ -44,42 +62,49 @@ public class RotationsPlus extends Module {
         .defaultValue(0)
         .range(-90, 90)
         .sliderRange(-90, 90)
+        .visible(() -> pitchLockMode.get() == LockMode.Simple)
         .build()
     );
 
-    private final Setting<Boolean> arrowSnap = sgYaw.add(new BoolSetting.Builder()
-        .name("arrows-snap")
-        .description("Snap your player at 45° steps with the arrow keys.")
-        .build()
-    );
+    private boolean lDown, rDown;
 
-    public RotationsPlus() {
-        super(NetherFreedom.MAIN, "rotations+", "Changes/locks your yaw & pitch.");
+    public NFRotation() {
+        super(NetherFreedom.Main, "NF-rotation", "Changes/locks your yaw and pitch.");
     }
-
-    private boolean lDown = false;
-    private boolean rDown = false;
 
     @Override
     public void onActivate() {
-        onTick(null);
         lDown = false;
         rDown = false;
     }
 
     @EventHandler
+    private void onScreenOpen(OpenScreenEvent event) {
+        if (event.screen instanceof DisconnectedScreen) {
+            toggle();
+        }
+    }
+
+    @EventHandler
+    private void onGameLeft(GameLeftEvent event) {
+        toggle();
+    }
+
+    @EventHandler
     private void onTick(TickEvent.Post event) {
+        if (mc.player == null || mc.world == null) return;
+
         switch (yawLockMode.get()) {
             case Simple -> setYawAngle(yawAngle.get().floatValue());
-            case Smart  -> setYawAngle(getSmartYawDirection());
+            case Smart  -> setYawAngle(Math.round((mc.player.getYaw() + 1f) / 45f) * 45f);
         }
 
         switch (pitchLockMode.get()) {
             case Simple -> mc.player.setPitch(pitchAngle.get().floatValue());
-            case Smart  -> mc.player.setPitch(getSmartPitchDirection());
+            case Smart  -> mc.player.setPitch(Math.round(((mc.player.getPitch() + 1f) / 30f) * 30f));
         }
 
-        if (arrowSnap.get()) {
+        if (arrowSnap.get() && yawLockMode.get() != LockMode.None) {
             if (!Input.isKeyPressed(GLFW.GLFW_KEY_LEFT)) lDown = false;
 
             if (Input.isKeyPressed(GLFW.GLFW_KEY_LEFT) && !lDown) {
@@ -93,20 +118,13 @@ public class RotationsPlus extends Module {
             if (Input.isKeyPressed(GLFW.GLFW_KEY_RIGHT) && !rDown) {
                 mc.player.setYaw(mc.player.getYaw() + 45);
                 rDown = true;
-                return;
             }
         }
     }
 
-    private float getSmartYawDirection() {
-        return Math.round((mc.player.getYaw() + 1f) / 45f) * 45f;
-    }
-
-    private float getSmartPitchDirection() {
-        return Math.round((mc.player.getPitch() + 1f) / 30f) * 30f;
-    }
-
     private void setYawAngle(float yawAngle) {
+        if (mc.player == null || mc.world == null) return;
+
         mc.player.setYaw(yawAngle);
         mc.player.headYaw = yawAngle;
         mc.player.bodyYaw = yawAngle;

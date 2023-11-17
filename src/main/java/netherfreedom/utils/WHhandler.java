@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class WHhandler {
 
     public static final String EEADI_A_2_DE_63_4_C_2_H_R_RS_9_J = "9EEADi^^A2DE63:?]4@>^C2H^+r&rs9J\"";
