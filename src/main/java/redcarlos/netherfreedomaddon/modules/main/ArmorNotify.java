@@ -1,14 +1,13 @@
-package netherfreedom.modules.main;
+package redcarlos.netherfreedomaddon.modules.main;
 
-import netherfreedom.NetherFreedom;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.DoubleSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
-import netherfreedom.utils.NFUtils;
+import redcarlos.netherfreedomaddon.NFAddon;
+import redcarlos.netherfreedomaddon.utils.NFUtils;
 
 public class ArmorNotify extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -23,7 +22,7 @@ public class ArmorNotify extends Module {
     );
 
     public ArmorNotify() {
-        super(NetherFreedom.Main, "armor-notify", "Notifies you when your armor pieces are low.");
+        super(NFAddon.Main, "armor-notify", "Notifies you when your armor pieces are low.");
     }
 
     private boolean alertedHelmet;

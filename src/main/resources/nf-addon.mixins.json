@@ -1,9 +1,9 @@
 {
   "required": true,
-  "package": "netherfreedom.mixins",
+  "package": "redcarlos.netherfreedomaddon.mixins",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "WindowTitleMixin"
+    "NFWindowTitleMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,4 +1,4 @@
-package netherfreedom.modules.main;
+package redcarlos.netherfreedomaddon.modules.main;
 
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.gui.GuiTheme;
@@ -16,11 +16,11 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
-import netherfreedom.NetherFreedom;
+import redcarlos.netherfreedomaddon.NFAddon;
 
 import java.util.stream.IntStream;
 
-import static netherfreedom.utils.NFUtils.csToPs;
+import static redcarlos.netherfreedomaddon.utils.NFUtils.csToPs;
 
 public class HotbarManager extends Module {
     private final Identifier[] itemIds = IntStream.range(0, 9)
@@ -124,7 +124,7 @@ public class HotbarManager extends Module {
     );
 
     public HotbarManager() {
-        super(NetherFreedom.Main, "hotbar-manager", "Automatically sort and replenish your hotbar.");
+        super(NFAddon.Main, "hotbar-manager", "Automatically sort and replenish your hotbar.");
     }
 
     @Override

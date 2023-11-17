@@ -1,4 +1,4 @@
-package netherfreedom.modules.main;
+package redcarlos.netherfreedomaddon.modules.main;
 
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -9,13 +9,14 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.misc.AutoLog;
 import meteordevelopment.meteorclient.systems.modules.movement.SafeWalk;
+import meteordevelopment.meteorclient.systems.modules.render.FreeLook;
 import meteordevelopment.meteorclient.systems.modules.world.LiquidFiller;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.item.Items;
-import netherfreedom.NetherFreedom;
+import redcarlos.netherfreedomaddon.NFAddon;
 
 import java.util.List;
 
@@ -24,21 +25,21 @@ public class DiggingTools extends Module {
 
     private final Setting<Boolean> disableOnDisconnect = sgGeneral.add(new BoolSetting.Builder()
         .name("disable-on-disconnect")
-        .description("Disables DiggingTools when you disconnect from a server.")
+        .description("Disables DiggingTools when you leave a server.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> useBaritone = sgGeneral.add(new BoolSetting.Builder()
         .name("use-baritone")
-        .description("Use baritone to automate the digging process (experimental).")
+        .description("Use baritone to automate the digging process (EXPERIMENTAL).")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> pickToggle = sgGeneral.add(new BoolSetting.Builder()
         .name("pickaxe-toggle")
-        .description("Automatically disables HighwayTools when you run out of pickaxes.")
+        .description("Automatically disables DiggingTools when you run out of pickaxes.")
         .defaultValue(true)
         .visible(() -> !useBaritone.get())
         .build()
@@ -50,20 +51,26 @@ public class DiggingTools extends Module {
         HotbarManager.class,
         LiquidFiller.class,
         NFBorer.class,
-        NFRotation.class,
-        SafeWalk.class,
         NFScaffold.class
     );
 
+    private final List<Class<? extends Module>> noBaritoneClasses = List.of(
+        FreeLook.class,
+        NFRotation.class,
+        SafeWalk.class
+    );
+
     public DiggingTools() {
-        super(NetherFreedom.Main, "digging-tools", "Automatically toggles the necessary modules to dig.");
+        super(NFAddon.Main, "digging-tools", "Automatically toggles the necessary modules to dig.");
     }
 
     @Override
     public void onActivate() {
         Modules modules = Modules.get();
 
-        if (useBaritone.get()) modules.get(BaritoneMiner.class).toggle();
+        if (useBaritone.get()) {
+            modules.get(BaritoneMiner.class).toggle();
+        } else noBaritoneClasses.forEach(moduleClass -> modules.get(moduleClass).toggle());
         commonClasses.forEach(moduleClass -> modules.get(moduleClass).toggle());
     }
 
@@ -72,6 +79,7 @@ public class DiggingTools extends Module {
         Modules modules = Modules.get();
 
         if (modules.get(BaritoneMiner.class).isActive()) modules.get(BaritoneMiner.class).toggle();
+        noBaritoneClasses.stream().filter(moduleClass -> modules.get(moduleClass).isActive());
         commonClasses.stream().filter(moduleClass -> modules.get(moduleClass).isActive());
     }
 

@@ -1,4 +1,4 @@
-package netherfreedom.modules.hud;
+package redcarlos.netherfreedomaddon.modules.hud;
 
 import meteordevelopment.meteorclient.settings.EnumSetting;
 import meteordevelopment.meteorclient.settings.Setting;
@@ -9,14 +9,14 @@ import meteordevelopment.meteorclient.systems.hud.HudRenderer;
 import meteordevelopment.meteorclient.systems.hud.elements.TextHud;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.misc.NameProtect;
-import netherfreedom.NetherFreedom;
+import redcarlos.netherfreedomaddon.NFAddon;
 
 import java.util.Calendar;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class NFWelcomeHud extends HudElement {
-    public static final HudElementInfo<NFWelcomeHud> INFO = new HudElementInfo<>(NetherFreedom.Hud, "welcome-hud", "Displays a friendly welcome.", NFWelcomeHud::new);
+    public static final HudElementInfo<NFWelcomeHud> INFO = new HudElementInfo<>(NFAddon.Hud, "welcome-hud", "Displays a friendly welcome.", NFWelcomeHud::new);
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 

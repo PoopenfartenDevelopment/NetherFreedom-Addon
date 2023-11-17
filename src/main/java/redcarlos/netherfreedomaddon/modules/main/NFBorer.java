@@ -1,4 +1,4 @@
-package netherfreedom.modules.main;
+package redcarlos.netherfreedomaddon.modules.main;
 
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.IntSetting;
@@ -11,11 +11,11 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import netherfreedom.NetherFreedom;
+import redcarlos.netherfreedomaddon.NFAddon;
 
 import java.util.stream.IntStream;
 
-import static netherfreedom.utils.NFUtils.*;
+import static redcarlos.netherfreedomaddon.utils.NFUtils.*;
 
 public class NFBorer extends Module {
     /**
@@ -39,7 +39,7 @@ public class NFBorer extends Module {
     );
 
     public NFBorer() {
-        super(NetherFreedom.Main, "NFBorer", "does the funni");
+        super(NFAddon.Main, "NF-borer", "does the funni");
     }
 
     @EventHandler

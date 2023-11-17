@@ -1,4 +1,4 @@
-package netherfreedom.modules.main;
+package redcarlos.netherfreedomaddon.modules.main;
 
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
@@ -10,7 +10,7 @@ import meteordevelopment.meteorclient.utils.world.Dimension;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket;
 import net.minecraft.text.Text;
-import netherfreedom.NetherFreedom;
+import redcarlos.netherfreedomaddon.NFAddon;
 
 public class AfkLogout extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -64,7 +64,7 @@ public class AfkLogout extends Module {
     );
 
     public AfkLogout() {
-        super(NetherFreedom.Main, "afk-logout", "Logs out when you are at a certain coords. Useful for afk travelling.");
+        super(NFAddon.Main, "afk-logout", "Logs out when you are at a certain coords. Useful for afk travelling.");
     }
 
     @EventHandler

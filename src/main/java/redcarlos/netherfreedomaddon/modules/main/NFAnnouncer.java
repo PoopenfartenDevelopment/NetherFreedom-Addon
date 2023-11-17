@@ -1,4 +1,4 @@
-package netherfreedom.modules.main;
+package redcarlos.netherfreedomaddon.modules.main;
 
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.IntSetting;
@@ -7,8 +7,8 @@ import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.text.Text;
-import netherfreedom.NetherFreedom;
-import netherfreedom.utils.NFUtils;
+import redcarlos.netherfreedomaddon.NFAddon;
+import redcarlos.netherfreedomaddon.utils.NFUtils;
 
 public class NFAnnouncer extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -26,7 +26,7 @@ public class NFAnnouncer extends Module {
     private int ticks;
 
     public NFAnnouncer() {
-        super(NetherFreedom.Main, "NF-announcer", "Sends the amount of netherrack blocks you've broken in chat.");
+        super(NFAddon.Main, "NF-announcer", "Sends the amount of netherrack blocks you've broken in chat.");
     }
 
     @Override

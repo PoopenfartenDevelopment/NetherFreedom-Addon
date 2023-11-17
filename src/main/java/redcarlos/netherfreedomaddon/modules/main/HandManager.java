@@ -1,4 +1,4 @@
-package netherfreedom.modules.main;
+package redcarlos.netherfreedomaddon.modules.main;
 
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
@@ -21,7 +21,7 @@ import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Direction;
-import netherfreedom.NetherFreedom;
+import redcarlos.netherfreedomaddon.NFAddon;
 
 public class HandManager extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -86,7 +86,7 @@ public class HandManager extends Module {
     private boolean swapped;
 
     public HandManager() {
-        super(NetherFreedom.Main, "hand-manager", "Automatically manages your offhand (optimized for digging netherrack).");
+        super(NFAddon.Main, "hand-manager", "Automatically manages your offhand (optimized for digging netherrack).");
     }
 
     @Override

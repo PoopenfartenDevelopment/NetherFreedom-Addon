@@ -1,6 +1,5 @@
-package netherfreedom.modules.hud;
+package redcarlos.netherfreedomaddon.modules.hud;
 
-import netherfreedom.NetherFreedom;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.hud.Alignment;
 import meteordevelopment.meteorclient.systems.hud.HudElement;
@@ -11,12 +10,13 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
+import redcarlos.netherfreedomaddon.NFAddon;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class NFBindsHud extends HudElement {
-    public static final HudElementInfo<NFBindsHud> INFO = new HudElementInfo<>(NetherFreedom.Hud, "binds-hud", "Displays modules you've binded keys to.", NFBindsHud::new);
+    public static final HudElementInfo<NFBindsHud> INFO = new HudElementInfo<>(NFAddon.Hud, "binds-hud", "Displays modules you've binded keys to.", NFBindsHud::new);
 
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "name": "NFClient",
-  "id": "nfclient",
+  "name": "NF Addon",
+  "id": "nfaddon",
   "version": "${version}",
-  "description": "Nether Freedom Project's Custom Client to dig netherrack.",
+  "description": "Nether Freedom Project's custom meteor addon to dig netherrack.",
   "authors": [
     "RedCarlos26",
     "Ethius",
@@ -14,17 +14,17 @@
     "homepage": "https://discord.gg/u3XNcDZyrY",
     "discord": "https://discord.gg/u3XNcDZyrY"
   },
-  "icon": "assets/netherfreedom/icon.png",
+  "icon": "assets/icon.png",
   "environment": "client",
   "entrypoints": {
     "meteor": [
-      "netherfreedom.NetherFreedom"
+      "redcarlos.netherfreedomaddon.NFAddon"
     ]
   },
   "mixins": [
-    "netherfreedom.mixins.json"
+    "nf-addon.mixins.json"
   ],
-  "accessWidener": "netherfreedom.accesswidener",
+  "accessWidener": "nf-addon.accesswidener",
   "custom": {
     "meteor-client:color": "145,61,226"
   },
@@ -32,6 +32,6 @@
     "java": ">=17",
     "minecraft": ">=${mc_version}",
     "meteor-client": ">0.5.4",
-    "baritone": "1.20.2"
+    "baritone": ">=${mc_version}"
   }
 }

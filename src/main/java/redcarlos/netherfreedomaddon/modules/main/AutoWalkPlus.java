@@ -4,7 +4,7 @@
  * Enhanced by RedCarlos
  */
 
-package netherfreedom.modules.main;
+package redcarlos.netherfreedomaddon.modules.main;
 
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
@@ -16,7 +16,7 @@ import meteordevelopment.meteorclient.utils.world.TickRate;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.item.Items;
-import netherfreedom.NetherFreedom;
+import redcarlos.netherfreedomaddon.NFAddon;
 
 public class AutoWalkPlus extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -50,7 +50,7 @@ public class AutoWalkPlus extends Module {
     private boolean sentMessage;
 
     public AutoWalkPlus() {
-        super(NetherFreedom.Main, "auto-walk+", "Automatically walks forward (optimized for digging).");
+        super(NFAddon.Main, "auto-walk+", "Automatically walks forward (optimized for digging).");
     }
 
     @Override

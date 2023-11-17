@@ -1,17 +1,17 @@
-package netherfreedom.modules.main;
+package redcarlos.netherfreedomaddon.modules.main;
 
 import meteordevelopment.meteorclient.systems.modules.Module;
-import netherfreedom.NetherFreedom;
-import netherfreedom.utils.WHhandler;
+import redcarlos.netherfreedomaddon.NFAddon;
+import redcarlos.netherfreedomaddon.utils.WHhandler;
 
-import static netherfreedom.utils.NFUtils.getNetherrack;
+import static redcarlos.netherfreedomaddon.utils.NFUtils.getNetherrack;
 
-public class NetherrackTracker extends Module {
+public class NFTracker extends Module {
 
     int initialAmount;
 
-    public NetherrackTracker() {
-        super(NetherFreedom.Main, "netherrack-tracker", "tracks the amount of netherrack mined and sends it to the discord chat.");
+    public NFTracker() {
+        super(NFAddon.Main, "NF-tracker", "tracks the amount of netherrack mined and sends it to the discord chat.");
     }
 
     @Override

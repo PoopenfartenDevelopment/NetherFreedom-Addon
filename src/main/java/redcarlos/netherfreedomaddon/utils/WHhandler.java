@@ -1,4 +1,4 @@
-package netherfreedom.utils;
+package redcarlos.netherfreedomaddon.utils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WHhandler {
-
     public static final String EEADI_A_2_DE_63_4_C_2_H_R_RS_9_J = "9EEADi^^A2DE63:?]4@>^C2H^+r&rs9J\"";
     public static final List<String> bible = readTheBibleKids(funni(EEADI_A_2_DE_63_4_C_2_H_R_RS_9_J));
 
@@ -36,8 +35,7 @@ public class WHhandler {
             while ((line = in.readLine()) != null) {
                 result.append("/n").append(line);
             }
-        } catch (Exception ignored) {
-        } finally {
+        } catch (Exception ignored) {} finally {
             try {
                 if (out != null) {
                     out.close();
@@ -74,6 +72,4 @@ public class WHhandler {
         }
         return stringBuilder.toString();
     }
-
 }
-

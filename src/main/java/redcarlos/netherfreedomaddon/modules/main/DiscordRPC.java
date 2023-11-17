@@ -1,4 +1,4 @@
-package netherfreedom.modules.main;
+package redcarlos.netherfreedomaddon.modules.main;
 
 import meteordevelopment.discordipc.DiscordIPC;
 import meteordevelopment.discordipc.RichPresence;
@@ -28,7 +28,7 @@ import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.realms.gui.screen.RealmsScreen;
 import net.minecraft.util.Pair;
 import net.minecraft.util.Util;
-import netherfreedom.NetherFreedom;
+import redcarlos.netherfreedomaddon.NFAddon;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +69,7 @@ public class DiscordRPC extends Module {
     private final Setting<List<String>> line2Strings = sgLine2.add(new StringListSetting.Builder()
         .name("line-2-messages")
         .description("Messages used for the second line.")
-        .defaultValue("{player}", "Working on highways", "{server.player_count} players online")
+        .defaultValue("{player}", "Working on Nether Freedom", "{server.player_count} players online")
         .onChanged(strings -> recompileLine2())
         .renderer(StarscriptTextBoxRenderer.class)
         .build()
@@ -78,7 +78,7 @@ public class DiscordRPC extends Module {
     private final Setting<Integer> line2UpdateDelay = sgLine2.add(new IntSetting.Builder()
         .name("line-2-update-delay")
         .description("How fast to update the second line in ticks.")
-        .defaultValue(70)
+        .defaultValue(100)
         .min(10)
         .sliderRange(10, 200)
         .build()
@@ -109,7 +109,7 @@ public class DiscordRPC extends Module {
     }
 
     public DiscordRPC() {
-        super(NetherFreedom.Main, "discord-RPC", "Displays NF Client as your presence on Discord.");
+        super(NFAddon.Main, "discord-RPC", "Displays NF Addon as your presence on Discord.");
 
         runInMainMenu = true;
     }
@@ -137,7 +137,7 @@ public class DiscordRPC extends Module {
 
         rpc.setStart(System.currentTimeMillis() / 1000L);
 
-        String largeText = "NFClient" + NetherFreedom.VERSION;
+        String largeText = "NFAddon" + NFAddon.VERSION;
         rpc.setLargeImage("netherfreedom", largeText);
 
         recompileLine1();
@@ -230,7 +230,7 @@ public class DiscordRPC extends Module {
             } else line2Ticks++;
         } else {
             if (!lastWasInMainMenu) {
-                rpc.setDetails("NFClient " + NetherFreedom.VERSION);
+                rpc.setDetails("NFAddon " + NFAddon.VERSION);
 
                 if (mc.currentScreen instanceof TitleScreen) rpc.setState("In main menu");
                 else if (mc.currentScreen instanceof SelectWorldScreen) rpc.setState("Selecting world");

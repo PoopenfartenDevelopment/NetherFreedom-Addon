@@ -1,8 +1,10 @@
-package netherfreedom.modules.main;
+package redcarlos.netherfreedomaddon.modules.main;
 
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.mixininterface.IVec3d;
-import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.settings.IntSetting;
+import meteordevelopment.meteorclient.settings.Setting;
+import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.BlockItem;
@@ -14,7 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import netherfreedom.NetherFreedom;
+import redcarlos.netherfreedomaddon.NFAddon;
 
 public class NFScaffold extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -40,7 +42,7 @@ public class NFScaffold extends Module {
     private boolean worked = false;
 
     public NFScaffold() {
-        super(NetherFreedom.Main, "scaffold+", "Scaffolds blocks under you.");
+        super(NFAddon.Main, "NF-scaffold", "Scaffolds blocks under you.");
     }
 
     @EventHandler

@@ -4,7 +4,7 @@
  * Enhanced by RedCarlos26
  */
 
-package netherfreedom.modules.main;
+package redcarlos.netherfreedomaddon.modules.main;
 
 import meteordevelopment.meteorclient.events.game.GameLeftEvent;
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
@@ -14,8 +14,8 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.misc.input.Input;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
-import netherfreedom.NetherFreedom;
 import org.lwjgl.glfw.GLFW;
+import redcarlos.netherfreedomaddon.NFAddon;
 
 public class NFRotation extends Module {
     private final SettingGroup sgYaw = settings.createGroup("Yaw");
@@ -69,7 +69,7 @@ public class NFRotation extends Module {
     private boolean lDown, rDown;
 
     public NFRotation() {
-        super(NetherFreedom.Main, "NF-rotation", "Changes/locks your yaw and pitch.");
+        super(NFAddon.Main, "NF-rotation", "Changes/locks your yaw and pitch.");
     }
 
     @Override

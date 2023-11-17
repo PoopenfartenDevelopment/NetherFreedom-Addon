@@ -1,31 +1,30 @@
-package netherfreedom;
+package redcarlos.netherfreedomaddon;
 
-import netherfreedom.modules.main.AfkLogout;
-import netherfreedom.modules.main.ArmorNotify;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.metadata.ModMetadata;
-import netherfreedom.modules.hud.*;
-import netherfreedom.modules.main.*;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.systems.Systems;
 import meteordevelopment.meteorclient.systems.hud.Hud;
 import meteordevelopment.meteorclient.systems.hud.HudGroup;
-import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.Category;
+import meteordevelopment.meteorclient.systems.modules.Modules;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.item.Items;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redcarlos.netherfreedomaddon.modules.hud.NFBindsHud;
+import redcarlos.netherfreedomaddon.modules.hud.NFWelcomeHud;
+import redcarlos.netherfreedomaddon.modules.main.*;
 
-public class NetherFreedom extends MeteorAddon {
-    public static final Logger LOG = LoggerFactory.getLogger("NF Client");
-    public static final ModMetadata METADATA = FabricLoader.getInstance().getModContainer("netherfreedom").orElseThrow().getMetadata();
+public class NFAddon extends MeteorAddon {
+    public static final Logger LOG = LoggerFactory.getLogger("NFAddon");
+    public static final ModMetadata METADATA = FabricLoader.getInstance().getModContainer("redcarlos.netherfreedomaddon").orElseThrow().getMetadata();
     public static final String VERSION = METADATA.getVersion().toString();
-    public static final Category Main = new Category("NF Client", Items.NETHERITE_PICKAXE.getDefaultStack());
-    public static final HudGroup Hud = new HudGroup("NF Client");
+    public static final Category Main = new Category("NF Addon", Items.NETHERITE_PICKAXE.getDefaultStack());
+    public static final HudGroup Hud = new HudGroup("NF Addon");
 
 	@Override
 	public void onInitialize() {
-        LOG.info("Initializing NF Client %s".formatted(NetherFreedom.VERSION));
+        LOG.info("Initializing NF Addon %s".formatted(NFAddon.VERSION));
 
         // Modules
         Modules modules = Modules.get();
@@ -53,7 +52,7 @@ public class NetherFreedom extends MeteorAddon {
 
     @Override
     public String getPackage() {
-        return "netherfreedom";
+        return "redcarlos.netherfreedomaddon";
     }
 
     @Override
