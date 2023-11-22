@@ -22,9 +22,9 @@
     ]
   },
   "mixins": [
-    "nf-addon.mixins.json"
+    "netherfreedom.mixins.json"
   ],
-  "accessWidener": "nf-addon.accesswidener",
+  "accessWidener": "netherfreedom.accesswidener",
   "custom": {
     "meteor-client:color": "145,61,226"
   },

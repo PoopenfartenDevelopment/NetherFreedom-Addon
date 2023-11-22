@@ -12,7 +12,7 @@ base {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/nf-addon.accesswidener")
+    accessWidenerPath = file("src/main/resources/netherfreedom.accesswidener")
 }
 
 repositories {
