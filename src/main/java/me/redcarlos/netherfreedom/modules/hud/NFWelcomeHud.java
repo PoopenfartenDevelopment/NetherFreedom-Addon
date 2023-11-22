@@ -1,5 +1,6 @@
 package me.redcarlos.netherfreedom.modules.hud;
 
+import me.redcarlos.netherfreedom.NFAddon;
 import meteordevelopment.meteorclient.settings.EnumSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
@@ -9,7 +10,6 @@ import meteordevelopment.meteorclient.systems.hud.HudRenderer;
 import meteordevelopment.meteorclient.systems.hud.elements.TextHud;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.misc.NameProtect;
-import me.redcarlos.netherfreedom.NFAddon;
 
 import java.util.Calendar;
 

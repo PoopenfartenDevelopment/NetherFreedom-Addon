@@ -6,6 +6,7 @@
 
 package me.redcarlos.netherfreedom.modules.main;
 
+import me.redcarlos.netherfreedom.NFAddon;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
@@ -16,7 +17,6 @@ import meteordevelopment.meteorclient.utils.world.TickRate;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.item.Items;
-import me.redcarlos.netherfreedom.NFAddon;
 
 public class AutoWalkPlus extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();

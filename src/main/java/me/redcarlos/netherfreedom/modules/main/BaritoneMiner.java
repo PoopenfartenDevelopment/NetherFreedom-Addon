@@ -4,6 +4,8 @@ import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
 import baritone.api.Settings;
 import baritone.api.pathing.goals.GoalBlock;
+import me.redcarlos.netherfreedom.NFAddon;
+import me.redcarlos.netherfreedom.utils.NFUtils;
 import meteordevelopment.meteorclient.events.game.GameLeftEvent;
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
@@ -34,8 +36,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import me.redcarlos.netherfreedom.NFAddon;
-import me.redcarlos.netherfreedom.utils.NFUtils;
 
 public class BaritoneMiner extends Module {
 

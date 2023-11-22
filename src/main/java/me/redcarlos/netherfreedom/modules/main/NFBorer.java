@@ -1,5 +1,6 @@
 package me.redcarlos.netherfreedom.modules.main;
 
+import me.redcarlos.netherfreedom.NFAddon;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.IntSetting;
 import meteordevelopment.meteorclient.settings.Setting;
@@ -11,7 +12,6 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import me.redcarlos.netherfreedom.NFAddon;
 
 import java.util.stream.IntStream;
 

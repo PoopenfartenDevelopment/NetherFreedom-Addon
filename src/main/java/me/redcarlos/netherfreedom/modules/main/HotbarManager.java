@@ -1,5 +1,6 @@
 package me.redcarlos.netherfreedom.modules.main;
 
+import me.redcarlos.netherfreedom.NFAddon;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.gui.GuiTheme;
 import meteordevelopment.meteorclient.gui.widgets.WWidget;
@@ -16,7 +17,6 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
-import me.redcarlos.netherfreedom.NFAddon;
 
 import java.util.stream.IntStream;
 

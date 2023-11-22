@@ -1,8 +1,8 @@
 package me.redcarlos.netherfreedom.modules.main;
 
-import meteordevelopment.meteorclient.systems.modules.Module;
 import me.redcarlos.netherfreedom.NFAddon;
 import me.redcarlos.netherfreedom.utils.WHhandler;
+import meteordevelopment.meteorclient.systems.modules.Module;
 
 import static me.redcarlos.netherfreedom.utils.NFUtils.getNetherrack;
 

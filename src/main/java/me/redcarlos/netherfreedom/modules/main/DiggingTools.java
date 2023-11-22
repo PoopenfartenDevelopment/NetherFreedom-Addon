@@ -1,5 +1,6 @@
 package me.redcarlos.netherfreedom.modules.main;
 
+import me.redcarlos.netherfreedom.NFAddon;
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.BoolSetting;
@@ -16,7 +17,6 @@ import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.item.Items;
-import me.redcarlos.netherfreedom.NFAddon;
 
 import java.util.List;
 

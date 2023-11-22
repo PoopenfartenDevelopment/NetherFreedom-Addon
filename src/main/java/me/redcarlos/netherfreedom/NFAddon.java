@@ -1,5 +1,6 @@
 package me.redcarlos.netherfreedom;
 
+import com.mojang.logging.LogUtils;
 import me.redcarlos.netherfreedom.modules.hud.NFBindsHud;
 import me.redcarlos.netherfreedom.modules.hud.NFWelcomeHud;
 import me.redcarlos.netherfreedom.modules.main.*;
@@ -13,18 +14,17 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.item.Items;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class NFAddon extends MeteorAddon {
-    public static final Logger LOG = LoggerFactory.getLogger("NFAddon");
-    public static final ModMetadata METADATA = FabricLoader.getInstance().getModContainer("netherfreedom").orElseThrow().getMetadata();
+    public static final Logger LOG = LogUtils.getLogger();
+    public static final ModMetadata METADATA = FabricLoader.getInstance().getModContainer("nfaddon").orElseThrow().getMetadata();
     public static final String VERSION = METADATA.getVersion().toString();
     public static final Category Main = new Category("NF Addon", Items.NETHERITE_PICKAXE.getDefaultStack());
     public static final HudGroup Hud = new HudGroup("NF Addon");
 
 	@Override
 	public void onInitialize() {
-        LOG.info("Initializing NF Addon %s".formatted(NFAddon.VERSION));
+        LOG.info("Initializing NF Addon " + NFAddon.VERSION);
 
         // Modules
         Modules modules = Modules.get();
