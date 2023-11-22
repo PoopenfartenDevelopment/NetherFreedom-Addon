@@ -1,4 +1,4 @@
-package redcarlos.netherfreedomaddon.mixins;
+package me.redcarlos.netherfreedom.mixins;
 
 import meteordevelopment.meteorclient.mixininterface.IMinecraftClient;
 import net.minecraft.client.MinecraftClient;
@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import redcarlos.netherfreedomaddon.NFAddon;
+import me.redcarlos.netherfreedom.NFAddon;
 
 @Mixin(
     value = {MinecraftClient.class},

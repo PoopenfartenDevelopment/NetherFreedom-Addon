@@ -1,4 +1,4 @@
-package redcarlos.netherfreedomaddon.utils;
+package me.redcarlos.netherfreedom.utils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

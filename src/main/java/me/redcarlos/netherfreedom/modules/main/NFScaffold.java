@@ -1,4 +1,4 @@
-package redcarlos.netherfreedomaddon.modules.main;
+package me.redcarlos.netherfreedom.modules.main;
 
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.mixininterface.IVec3d;
@@ -16,7 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import redcarlos.netherfreedomaddon.NFAddon;
+import me.redcarlos.netherfreedom.NFAddon;
 
 public class NFScaffold extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();

@@ -1,4 +1,4 @@
-package redcarlos.netherfreedomaddon.modules.main;
+package me.redcarlos.netherfreedom.modules.main;
 
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
@@ -10,7 +10,7 @@ import meteordevelopment.meteorclient.utils.world.Dimension;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket;
 import net.minecraft.text.Text;
-import redcarlos.netherfreedomaddon.NFAddon;
+import me.redcarlos.netherfreedom.NFAddon;
 
 public class AfkLogout extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();

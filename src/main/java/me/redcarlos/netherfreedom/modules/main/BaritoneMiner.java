@@ -1,4 +1,4 @@
-package redcarlos.netherfreedomaddon.modules.main;
+package me.redcarlos.netherfreedom.modules.main;
 
 import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
@@ -34,8 +34,8 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import redcarlos.netherfreedomaddon.NFAddon;
-import redcarlos.netherfreedomaddon.utils.NFUtils;
+import me.redcarlos.netherfreedom.NFAddon;
+import me.redcarlos.netherfreedom.utils.NFUtils;
 
 public class BaritoneMiner extends Module {
 

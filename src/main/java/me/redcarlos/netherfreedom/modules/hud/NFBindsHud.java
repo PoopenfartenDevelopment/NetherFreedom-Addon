@@ -1,4 +1,4 @@
-package redcarlos.netherfreedomaddon.modules.hud;
+package me.redcarlos.netherfreedom.modules.hud;
 
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.hud.Alignment;
@@ -10,7 +10,7 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
-import redcarlos.netherfreedomaddon.NFAddon;
+import me.redcarlos.netherfreedom.NFAddon;
 
 import java.util.ArrayList;
 import java.util.List;

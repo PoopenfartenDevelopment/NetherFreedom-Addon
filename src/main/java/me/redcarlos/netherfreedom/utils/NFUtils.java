@@ -1,4 +1,4 @@
-package redcarlos.netherfreedomaddon.utils;
+package me.redcarlos.netherfreedom.utils;
 
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;

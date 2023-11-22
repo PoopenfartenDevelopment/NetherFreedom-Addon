@@ -1,4 +1,4 @@
-package redcarlos.netherfreedomaddon.modules.main;
+package me.redcarlos.netherfreedom.modules.main;
 
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.IntSetting;
@@ -7,8 +7,8 @@ import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.text.Text;
-import redcarlos.netherfreedomaddon.NFAddon;
-import redcarlos.netherfreedomaddon.utils.NFUtils;
+import me.redcarlos.netherfreedom.NFAddon;
+import me.redcarlos.netherfreedom.utils.NFUtils;
 
 public class NFAnnouncer extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();

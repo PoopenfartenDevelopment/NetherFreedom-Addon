@@ -18,7 +18,7 @@
   "environment": "client",
   "entrypoints": {
     "meteor": [
-      "redcarlos.netherfreedomaddon.NFAddon"
+      "me.redcarlos.netherfreedom.NFAddon"
     ]
   },
   "mixins": [
@@ -31,7 +31,6 @@
   "depends": {
     "java": ">=17",
     "minecraft": ">=${mc_version}",
-    "meteor-client": ">0.5.4",
-    "baritone": ">=${mc_version}"
+    "meteor-client": ">0.5.4"
   }
 }

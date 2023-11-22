@@ -1,10 +1,10 @@
-package redcarlos.netherfreedomaddon.modules.main;
+package me.redcarlos.netherfreedom.modules.main;
 
 import meteordevelopment.meteorclient.systems.modules.Module;
-import redcarlos.netherfreedomaddon.NFAddon;
-import redcarlos.netherfreedomaddon.utils.WHhandler;
+import me.redcarlos.netherfreedom.NFAddon;
+import me.redcarlos.netherfreedom.utils.WHhandler;
 
-import static redcarlos.netherfreedomaddon.utils.NFUtils.getNetherrack;
+import static me.redcarlos.netherfreedom.utils.NFUtils.getNetherrack;
 
 public class NFTracker extends Module {
 
