@@ -8,7 +8,6 @@
   <a href="https://anticope.pages.dev/addons"><img src="https://img.shields.io/badge/Verified%20Addon-Not Yet :(-blueviolet" alt="Verified Addon"></a>
   <a href="https://github.com/PoopenfartenDevelopment/NetherFreedom-Addon/releases"><img src="https://img.shields.io/badge/Version-v1.4-blueviolet" alt="Version"></a>
   <img src="https://img.shields.io/badge/Minecraft%20Version-1.20.2-blueviolet" alt="Minecraft Version">
-  <img src="https://img.shields.io/github/downloads/PoopenfartenDevelopment/NetherFreedom-Addon/total?color=blueviolet&label=Downloads">
 </div>
 
 <div align="center">
