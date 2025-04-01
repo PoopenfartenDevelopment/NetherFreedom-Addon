@@ -7,6 +7,8 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.item.Items;
+import net.minecraft.item.PickaxeItem;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -61,39 +63,41 @@ public class NetherBorer extends Module {
             breakBlock(forward(playerPos, i));
             breakBlock(forward(playerPos, i).up());
             breakBlock(forward(playerPos, i).up(2));
-            breakBlock(forward(playerPos, i).up(3));
 
             breakBlock(right(forward(playerPos, i), 1));
             breakBlock(right(forward(playerPos, i), 1).up());
             breakBlock(right(forward(playerPos, i), 1).up(2));
-            breakBlock(right(forward(playerPos, i), 1).up(3));
 
             breakBlock(right(forward(playerPos, i), 2));
             breakBlock(right(forward(playerPos, i), 2).up());
             breakBlock(right(forward(playerPos, i), 2).up(2));
-            breakBlock(right(forward(playerPos, i), 2).up(3));
+
+            breakBlock(right(forward(playerPos, i), 3));
+            breakBlock(right(forward(playerPos, i), 3).up());
+            breakBlock(right(forward(playerPos, i), 3).up(2));
 
             breakBlock(left(forward(playerPos, i), 1));
             breakBlock(left(forward(playerPos, i), 1).up());
             breakBlock(left(forward(playerPos, i), 1).up(2));
-            breakBlock(left(forward(playerPos, i), 1).up(3));
 
             breakBlock(left(forward(playerPos, i), 2));
             breakBlock(left(forward(playerPos, i), 2).up());
             breakBlock(left(forward(playerPos, i), 2).up(2));
-            breakBlock(left(forward(playerPos, i), 2).up(3));
 
             breakBlock(left(forward(playerPos, i), 3));
             breakBlock(left(forward(playerPos, i), 3).up());
             breakBlock(left(forward(playerPos, i), 3).up(2));
-            breakBlock(left(forward(playerPos, i), 3).up(3));
+
+            breakBlock(backward(playerPos, i));
+            breakBlock(backward(playerPos, i).up());
+            breakBlock(backward(playerPos, i).up(2));
         });
     }
 
     protected void breakBlock(BlockPos blockPos) {
         if (mc.player == null || mc.world == null) return;
 
-        if (packets >= 130 || mc.world.getBlockState(blockPos).isReplaceable()) {
+        if (!(mc.player.getMainHandStack().getItem() instanceof PickaxeItem) || packets >= 130 || mc.world.getBlockState(blockPos).isReplaceable()) {
             return;
         }
 

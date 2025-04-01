@@ -21,6 +21,7 @@ public class NFUtils {
     private NFUtils() {}
 
     // Packets
+
     private static final Int2IntMap packetToClient = new Int2IntOpenHashMap();
     private static final Int2IntMap clientToPacket = new Int2IntOpenHashMap();
 
@@ -50,6 +51,7 @@ public class NFUtils {
     }
 
     // BlockPos
+
     public static BlockPos forward(BlockPos pos, int distance) {
         return switch (mc.player.getHorizontalFacing()) {
             case SOUTH -> pos.south(distance);
@@ -87,6 +89,7 @@ public class NFUtils {
     }
 
     // Other
+
     public static int haveItem(Item item) {
         int count = 0;
         for (int i = 0; i < mc.player.getInventory().main.size(); i++) {

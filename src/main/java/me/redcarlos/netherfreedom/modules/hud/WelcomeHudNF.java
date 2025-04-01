@@ -16,16 +16,7 @@ import java.util.Calendar;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class WelcomeHudNF extends HudElement {
-    public static final HudElementInfo<WelcomeHudNF> INFO = new HudElementInfo<>(NFAddon.Hud, "welcome-hud", "Displays a friendly welcome.", WelcomeHudNF::new);
-
-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
-
-    private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode")
-        .description("What text to show for the greeting.")
-        .defaultValue(Mode.Time)
-        .build()
-    );
+    public static final HudElementInfo<WelcomeHudNF> INFO = new HudElementInfo<>(NFAddon.Hud, "welcome-hud-NF", "Displays a friendly welcome.", WelcomeHudNF::new);
 
     private String leftText;
     private String rightText;
@@ -37,13 +28,7 @@ public class WelcomeHudNF extends HudElement {
 
     @Override
     public void tick(HudRenderer renderer) {
-        int localTime = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-
-        if (mode.get() == Mode.NetherFreedom) leftText = "Welcome to NF Client, ";
-        else if (localTime <= 12) leftText = "Good Morning, ";
-        else if (localTime <= 16) leftText = "Good Afternoon, ";
-        else leftText = "Good Evening, ";
-
+        leftText = "Welcome to NetherFreedom, ";
         rightText = Modules.get().get(NameProtect.class).getName(mc.getSession().getUsername());
 
         leftWidth = renderer.textWidth(leftText);
@@ -58,16 +43,11 @@ public class WelcomeHudNF extends HudElement {
         double y = this.y;
 
         if (isInEditor()) {
-            renderer.text("NFWelcome", x, y, TextHud.getSectionColor(0), true);
+            renderer.text("WelcomeHUD-NF", x, y, TextHud.getSectionColor(0), true);
             return;
         }
 
         renderer.text(leftText, x, y, TextHud.getSectionColor(0), true);
         renderer.text(rightText, x + leftWidth, y, TextHud.getSectionColor(1), true);
-    }
-
-    public enum Mode {
-        NetherFreedom,
-        Time
     }
 }

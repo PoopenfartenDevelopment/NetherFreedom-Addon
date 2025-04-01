@@ -19,6 +19,7 @@ import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
+import meteordevelopment.meteorclient.utils.misc.HorizontalDirection;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
@@ -110,11 +111,12 @@ public class BaritoneMiner extends Module {
     );
 
     public BaritoneMiner() {
-        super(NFAddon.Main, "baritone-miner-Beta", "Paths automatically (BETA).");
+        super(NFAddon.Main, " [BETA]-baritone-miner ", "Paths to dig automatically.");
     }
 
-    private BlockPos endOfLinePos, barPos, offsetPos, currPlayerPos, shulkerPlacePos, savedPos = null;
     private Direction toEndOfLineDir, toAdvanceDir, shulkerPlaceDir = null;
+    private HorizontalDirection dir = null;
+    private BlockPos endOfLinePos, barPos, offsetPos, currPlayerPos, shulkerPlacePos, savedPos = null;
     private boolean offsetting, bindPressed, isPaused, refilling, placedShulker, defined = false;
     private int length, initialNetherrack, initialPicksBroken = 0;
 
@@ -122,6 +124,13 @@ public class BaritoneMiner extends Module {
 
     @Override
     public void onActivate() {
+        baritoneSettings.blockPlacementPenalty.value = 0.0;
+        baritoneSettings.assumeWalkOnLava.value = true;
+        baritoneSettings.allowPlace.value = true;
+        baritoneSettings.mineScanDroppedItems.value = true;
+
+        dir = HorizontalDirection.get(mc.player.getYaw());
+
         if (!defined && !pathStart.get()) {
             start();
         } else if (!defined && pathStart.get()) {
@@ -134,11 +143,6 @@ public class BaritoneMiner extends Module {
 
         initialPicksBroken = NFUtils.getPickaxesBroken();
         initialNetherrack = NFUtils.getNetherrack();
-
-        baritoneSettings.blockPlacementPenalty.value = 0.0;
-        baritoneSettings.assumeWalkOnLava.value = true;
-        baritoneSettings.allowPlace.value = true;
-        baritoneSettings.mineScanDroppedItems.value = true;
     }
 
     @Override
@@ -234,10 +238,13 @@ public class BaritoneMiner extends Module {
                     barPos = new BlockPos(barPos.offset(toEndOfLineDir));
                 }
                 setGoal(barPos);
+
+                /**
                 // Places a block under the goal to keep baritone from pulling any funny business
                 if (underPos.getY() != cornerOne.get().getY()) {
                     placeUnder(barPos);
                 }
+                 */
             } catch (Exception ignored) {}
         }
 
@@ -335,9 +342,9 @@ public class BaritoneMiner extends Module {
 
         currPlayerPos = mc.player.getBlockPos();
         BlockPos extrapolatePos = new BlockPos(cornerOne.get().getX(), cornerOne.get().getY(), cornerTwo.get().getZ());
-        //toEndOfLineDir = findBlockDir(cornerOne.get(), extrapolatePos);
+        toEndOfLineDir = findBlockDir(cornerOne.get(), extrapolatePos);
         length = findDistance(cornerOne.get(), extrapolatePos, toEndOfLineDir);
-        //toAdvanceDir = findBlockDir(extrapolatePos, cornerTwo.get());
+        toAdvanceDir = findBlockDir(extrapolatePos, cornerTwo.get());
         endOfLinePos = currPlayerPos.offset(toEndOfLineDir, length);
         barPos = currPlayerPos.offset(toEndOfLineDir, 2);
         shulkerPlaceDir = toEndOfLineDir.getOpposite();
@@ -346,15 +353,15 @@ public class BaritoneMiner extends Module {
         setGoal(barPos);
     }
 
-    /**
+
     // Finds the direction for one block to get to the other
     private Direction findBlockDir(BlockPos originBlock, BlockPos goalBlock) {
         // Very bad this can very easily break if the 2 blocks positions are not inline with each other
         BlockPos vec3d = BlockPos.ofFloored(Math.signum(goalBlock.getX() - originBlock.getX()), 0, Math.signum(goalBlock.getZ() - originBlock.getZ()));
-        return Direction.fromVector(vec3d);
+        return Direction.getFacing(Vec3d.of(vec3d)).getOpposite();
     }
-     */
 
+    /**
     // Places a block below the input
     private void placeUnder(BlockPos pos) {
         if (mc.world == null) return;
@@ -364,6 +371,7 @@ public class BaritoneMiner extends Module {
             BlockUtils.place(under, InvUtils.findInHotbar(Blocks.NETHERRACK.asItem()), false, 0);
         }
     }
+    */
 
     private void setGoal(BlockPos goal) {
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(goal));
@@ -373,13 +381,11 @@ public class BaritoneMiner extends Module {
     private int findDistance(BlockPos pos1, BlockPos pos2, Direction dir) {
         int dist = 0;
         switch (dir) {
-            case EAST, SOUTH -> {
-            }
-            case WEST -> {
-                dist = Math.abs(pos1.getX() - pos2.getX());
-            }
-            case NORTH -> {
+            case NORTH, SOUTH -> {
                 dist = Math.abs(pos1.getZ() - pos2.getZ());
+            }
+            case EAST, WEST -> {
+                dist = Math.abs(pos1.getX() - pos2.getX());
             }
         }
         return dist;
