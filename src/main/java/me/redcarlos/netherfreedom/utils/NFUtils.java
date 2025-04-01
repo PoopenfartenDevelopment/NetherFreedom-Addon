@@ -20,39 +20,6 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 public class NFUtils {
     private NFUtils() {}
 
-    // Armor
-    public static boolean checkNotifyThreshold(ItemStack i, double threshold) {
-        return getArmorDamage(i) <= threshold;
-    }
-
-    public static double getArmorDamage(ItemStack i) {
-        return (((double) (i.getMaxDamage() - i.getDamage()) / i.getMaxDamage()) * 100);
-    }
-
-    public static boolean isHelmetArmor(ItemStack itemStack) {
-        if (itemStack == null) return false;
-        Item item = itemStack.getItem();
-        return item instanceof ArmorItem armorItem && armorItem.getSlotType() == EquipmentSlot.HEAD;
-    }
-
-    public static boolean isChestplateArmor(ItemStack itemStack) {
-        if (itemStack == null) return false;
-        Item item = itemStack.getItem();
-        return item instanceof ArmorItem armorItem && armorItem.getSlotType() == EquipmentSlot.CHEST;
-    }
-
-    public static boolean isLeggingsArmor(ItemStack itemStack) {
-        if (itemStack == null) return false;
-        Item item = itemStack.getItem();
-        return item instanceof ArmorItem armorItem && armorItem.getSlotType() == EquipmentSlot.LEGS;
-    }
-
-    public static boolean isBootsArmor(ItemStack itemStack) {
-        if (itemStack == null) return false;
-        Item item = itemStack.getItem();
-        return item instanceof ArmorItem armorItem && armorItem.getSlotType() == EquipmentSlot.FEET;
-    }
-
     // Packets
     private static final Int2IntMap packetToClient = new Int2IntOpenHashMap();
     private static final Int2IntMap clientToPacket = new Int2IntOpenHashMap();

@@ -1,10 +1,10 @@
 package me.redcarlos.netherfreedom;
 
 import com.mojang.logging.LogUtils;
-import me.redcarlos.netherfreedom.modules.hud.NFBindsHud;
 import me.redcarlos.netherfreedom.modules.hud.NFWelcomeHud;
 import me.redcarlos.netherfreedom.modules.main.*;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
+import meteordevelopment.meteorclient.pathing.BaritoneUtils;
 import meteordevelopment.meteorclient.systems.Systems;
 import meteordevelopment.meteorclient.systems.hud.Hud;
 import meteordevelopment.meteorclient.systems.hud.HudGroup;
@@ -30,24 +30,23 @@ public class NFAddon extends MeteorAddon {
         Modules modules = Modules.get();
 
         // Main
-        modules.add(new AfkLogout());
-        modules.add(new ArmorNotify());
-        modules.add(new AutoWalkPlus());
-        modules.add(new BaritoneMiner());
+        modules.add(new AutoWalkNF());
+
         modules.add(new DiggingTools());
-        modules.add(new DiscordRPC());
         modules.add(new HandManager());
         modules.add(new HotbarManager());
         //modules.add(new NetherrackTracker());
-        modules.add(new NFAnnouncer());
-        modules.add(new NFBorer());
+        modules.add(new NetherBorer());
         modules.add(new NFRotation());
         modules.add(new NFScaffold());
 
         // HUD
         Hud hud = Systems.get(Hud.class);
-        hud.register(NFBindsHud.INFO);
         hud.register(NFWelcomeHud.INFO);
+
+        if (BaritoneUtils.IS_AVAILABLE) {
+            modules.add(new BaritoneMiner());
+        }
 	}
 
     @Override

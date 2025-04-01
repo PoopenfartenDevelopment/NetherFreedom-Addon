@@ -50,7 +50,7 @@ public class DiggingTools extends Module {
         HandManager.class,
         HotbarManager.class,
         LiquidFiller.class,
-        NFBorer.class,
+        NetherBorer.class,
         NFScaffold.class
     );
 

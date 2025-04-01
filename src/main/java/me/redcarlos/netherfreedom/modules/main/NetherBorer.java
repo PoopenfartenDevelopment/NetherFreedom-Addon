@@ -17,20 +17,11 @@ import java.util.stream.IntStream;
 
 import static me.redcarlos.netherfreedom.utils.NFUtils.*;
 
-public class NFBorer extends Module {
-    /**
-     * Last time packets were sent
-     */
-    private long lastUpdateTime = 0;
-    /**
-     * Floored block position of player
-     */
-    private BlockPos playerPos = BlockPos.ORIGIN;
-    private int packets = 0;
+public class NetherBorer extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Integer> keepY = sgGeneral.add(new IntSetting.Builder()
-        .name("KeepY")
+        .name("keepY")
         .description("Keeps a specific Y level when digging.")
         .defaultValue(120)
         .range(-1, 255)
@@ -38,14 +29,19 @@ public class NFBorer extends Module {
         .build()
     );
 
-    public NFBorer() {
-        super(NFAddon.Main, "NF-borer", "does the funni");
+    private int packets = 0;
+    private long lastUpdateTime = 0; // Last time packets were sent
+    private BlockPos playerPos = BlockPos.ORIGIN; // Floored block position of player
+
+    public NetherBorer() {
+        super(NFAddon.Main, "NF-borer", "Digs netherrack. Optimized for NetherFreedom");
     }
 
     @EventHandler
     public void tick(TickEvent.Pre event) {
         if (mc.player == null || mc.world == null) return;
-        // previous floored block position of player
+
+        // Previous floored block position of player
         BlockPos prevBlockPos = playerPos;
         playerPos = new BlockPos(
             MathHelper.floor(mc.player.getX()),
@@ -55,9 +51,8 @@ public class NFBorer extends Module {
 
         if (playerPos != prevBlockPos || Util.getMeasuringTimeMs() - lastUpdateTime > 800) {
             mineArea(playerPos.add(0, 0, 0));
+            lastUpdateTime = Util.getMeasuringTimeMs();
         }
-
-        lastUpdateTime = Util.getMeasuringTimeMs();
         packets = 0;
     }
 
@@ -105,5 +100,7 @@ public class NFBorer extends Module {
         mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, blockPos, Direction.UP));
         mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, blockPos, Direction.UP));
         packets += 2;
+
+        mc.player.getInventory().updateItems();
     }
 }

@@ -43,7 +43,6 @@ public class BaritoneMiner extends Module {
     todo:future features list
         1. option for it to stop at certain goal position
         2. option to disconnect on running out of pickaxes
-        3. swarm websocket integration(some day)
     */
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -111,7 +110,7 @@ public class BaritoneMiner extends Module {
     );
 
     public BaritoneMiner() {
-        super(NFAddon.Main, "BaritoneMiner", "Paths automatically (EXPERIMENTAL)");
+        super(NFAddon.Main, "BaritoneMiner", "Paths automatically (EXPERIMENTAL).");
     }
 
     private BlockPos endOfLinePos, barPos, offsetPos, currPlayerPos, shulkerPlacePos, savedPos = null;
@@ -172,10 +171,10 @@ public class BaritoneMiner extends Module {
             // Places shulker and toggles borer rotating and placing another shulker if the spot is invalid
             shulkerPlacePos = currPlayerPos.offset(shulkerPlaceDir, 2);
 
-            if (modules.get(NFBorer.class).isActive()) modules.get(NFBorer.class).toggle();
+            if (modules.get(NetherBorer.class).isActive()) modules.get(NetherBorer.class).toggle();
 
             if (!BlockUtils.place(shulkerPlacePos, findShulkerBox(), true, 0, true, true, false)) {
-                info("Trying to place at " + shulkerPlacePos.getX() + " " + shulkerPlacePos.getZ());
+                info("Trying to place shulker at " + shulkerPlacePos.getX() + " " + shulkerPlacePos.getZ());
                 shulkerPlaceDir = shulkerPlaceDir.rotateYClockwise();
                 placedShulker = false;
                 shulkerPlacePos = null;
@@ -216,7 +215,7 @@ public class BaritoneMiner extends Module {
             placedShulker = false;
             refilling = false;
 
-            if (!modules.get(NFBorer.class).isActive()) modules.get(NFBorer.class).toggle();
+            if (!modules.get(NetherBorer.class).isActive()) modules.get(NetherBorer.class).toggle();
         }
 
         // The mode it will be working in most of the time
@@ -286,7 +285,7 @@ public class BaritoneMiner extends Module {
         WVerticalList list = theme.verticalList();
         WHorizontalList b = list.add(theme.horizontalList()).expandX().widget();
 
-        WButton reset = b.add(theme.button("reset progress")).expandX().widget();
+        WButton reset = b.add(theme.button("Reset progress")).expandX().widget();
         reset.action = () -> {
             try {
                 placedShulker = false;
@@ -347,7 +346,7 @@ public class BaritoneMiner extends Module {
         setGoal(barPos);
     }
 
-    /*
+    /**
     // Finds the direction for one block to get to the other
     private Direction findBlockDir(BlockPos originBlock, BlockPos goalBlock) {
         // Very bad this can very easily break if the 2 blocks positions are not inline with each other
@@ -413,7 +412,7 @@ public class BaritoneMiner extends Module {
                 availableSlots++;
             }
         }
-        info("availableSlots: " + availableSlots);
+        info("Available slots: " + availableSlots);
 
         for (int i = 0; i < mc.player.currentScreenHandler.slots.size() - 36; i++) {
             Item item = mc.player.currentScreenHandler.getSlot(i).getStack().getItem();
@@ -424,7 +423,7 @@ public class BaritoneMiner extends Module {
                 }
             }
         }
-        info("picksMoved: " + picksMoved);
+        info("Picks moved: " + picksMoved);
         return picksMoved;
     }
 }

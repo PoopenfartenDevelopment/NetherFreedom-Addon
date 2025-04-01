@@ -10,10 +10,6 @@
   <img src="https://img.shields.io/badge/Minecraft%20Version-1.20.2-blueviolet" alt="Minecraft Version">
 </div>
 
-<div align="center">
-  <a href="https://discord.gg/u3XNcDZyrY"><img src="https://invidget.switchblade.xyz/u3XNcDZyrY"></a>
-</div>
-
 # How to use
 - Download the lastest Meteor Client DevBuild.
 - Put NF Addon in your `.minecraft/mods` folder where you have installed Meteor.

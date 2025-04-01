@@ -11,8 +11,7 @@
 
   ],
   "contact": {
-    "homepage": "https://discord.gg/u3XNcDZyrY",
-    "discord": "https://discord.gg/u3XNcDZyrY"
+    "homepage": "https://github.com/PoopenfartenDevelopment/NetherFreedom-Addon"
   },
   "icon": "assets/icon.png",
   "environment": "client",
@@ -22,7 +21,6 @@
     ]
   },
   "mixins": [
-    "netherfreedom.mixins.json"
   ],
   "accessWidener": "netherfreedom.accesswidener",
   "custom": {
@@ -31,6 +29,7 @@
   "depends": {
     "java": ">=17",
     "minecraft": ">=${mc_version}",
-    "meteor-client": ">0.5.4"
+    "meteor-client": ">=${minecraft_version}-9",
+    "baritone-meteor": "${minecraft_version}-SNAPSHOT"
   }
 }
