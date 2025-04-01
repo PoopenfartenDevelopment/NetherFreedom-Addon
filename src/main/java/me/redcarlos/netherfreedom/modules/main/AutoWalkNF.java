@@ -66,7 +66,7 @@ public class AutoWalkNF extends Module {
     private boolean sentLagMessage;
 
     public AutoWalkNF() {
-        super(NFAddon.Main, "auto-walk+", "Automatically walks forward (optimized for digging).");
+        super(NFAddon.Main, "auto-walk-NF", "Automatically walks forward. Optimized for NetherFreedom.");
     }
 
     @Override

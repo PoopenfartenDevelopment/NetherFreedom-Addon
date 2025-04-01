@@ -34,7 +34,7 @@ public class NetherBorer extends Module {
     private BlockPos playerPos = BlockPos.ORIGIN; // Floored block position of player
 
     public NetherBorer() {
-        super(NFAddon.Main, "NF-borer", "Digs netherrack. Optimized for NetherFreedom");
+        super(NFAddon.Main, "NF-borer", "Digs netherrack. Optimized for NetherFreedom.");
     }
 
     @EventHandler

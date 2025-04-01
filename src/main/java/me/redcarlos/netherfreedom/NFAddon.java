@@ -1,7 +1,7 @@
 package me.redcarlos.netherfreedom;
 
 import com.mojang.logging.LogUtils;
-import me.redcarlos.netherfreedom.modules.hud.NFWelcomeHud;
+import me.redcarlos.netherfreedom.modules.hud.WelcomeHudNF;
 import me.redcarlos.netherfreedom.modules.main.*;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.pathing.BaritoneUtils;
@@ -31,18 +31,15 @@ public class NFAddon extends MeteorAddon {
 
         // Main
         modules.add(new AutoWalkNF());
-
         modules.add(new DiggingTools());
-        modules.add(new HandManager());
         modules.add(new HotbarManager());
-        //modules.add(new NetherrackTracker());
         modules.add(new NetherBorer());
-        modules.add(new NFRotation());
-        modules.add(new NFScaffold());
+        modules.add(new RotationNF());
+        modules.add(new OffhandManager());
 
         // HUD
         Hud hud = Systems.get(Hud.class);
-        hud.register(NFWelcomeHud.INFO);
+        hud.register(WelcomeHudNF.INFO);
 
         if (BaritoneUtils.IS_AVAILABLE) {
             modules.add(new BaritoneMiner());

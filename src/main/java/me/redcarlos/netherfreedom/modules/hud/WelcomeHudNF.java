@@ -15,8 +15,8 @@ import java.util.Calendar;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
-public class NFWelcomeHud extends HudElement {
-    public static final HudElementInfo<NFWelcomeHud> INFO = new HudElementInfo<>(NFAddon.Hud, "welcome-hud", "Displays a friendly welcome.", NFWelcomeHud::new);
+public class WelcomeHudNF extends HudElement {
+    public static final HudElementInfo<WelcomeHudNF> INFO = new HudElementInfo<>(NFAddon.Hud, "welcome-hud", "Displays a friendly welcome.", WelcomeHudNF::new);
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
@@ -31,7 +31,7 @@ public class NFWelcomeHud extends HudElement {
     private String rightText;
     private double leftWidth;
 
-    public NFWelcomeHud() {
+    public WelcomeHudNF() {
         super(INFO);
     }
 

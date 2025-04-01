@@ -27,8 +27,9 @@
     "meteor-client:color": "145,61,226"
   },
   "depends": {
-    "java": ">=17",
-    "minecraft": ">=${mc_version}",
+    "java": ">=21",
+    "minecraft": "${minecraft_version}",
+    "fabricloader": ">=${loader_version}",
     "meteor-client": ">=${minecraft_version}-9",
     "baritone-meteor": "${minecraft_version}-SNAPSHOT"
   }

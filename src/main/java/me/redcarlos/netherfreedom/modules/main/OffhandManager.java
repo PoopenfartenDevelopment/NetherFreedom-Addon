@@ -16,6 +16,7 @@ import meteordevelopment.meteorclient.utils.entity.EntityUtils;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
@@ -23,12 +24,10 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Direction;
 
-public class HandManager extends Module {
+public class OffhandManager extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgAutoGap = settings.createGroup("Auto Gap");
     private final SettingGroup sgAutoTotem = settings.createGroup("Auto Totem");
-
-    // General
 
     private final Setting<Boolean> hotbar = sgGeneral.add(new BoolSetting.Builder()
         .name("hotbar")
@@ -82,30 +81,46 @@ public class HandManager extends Module {
 
     private Item currentItem;
     private boolean eating;
+    private boolean justStarted;
+    private boolean moved;
     private boolean sentMsg;
     private boolean swapped;
 
-    public HandManager() {
-        super(NFAddon.Main, "hand-manager", "Automatically manages your offhand (optimized for digging netherrack).");
+    public OffhandManager() {
+        super(NFAddon.Main, "hand-manager", "Automatically manages your offhand. Optimized for NetherFreedom.");
     }
 
     @Override
     public void onActivate() {
         eating = false;
+        justStarted = true;
+        moved = false;
         sentMsg = false;
-        swapped = false;
+        swapped = true;
         currentItem = Item.Totem;
     }
 
+    @Override
+    public void onDeactivate() {
+        if (eating) stopEating();
+    }
+
     @EventHandler
-    public void onRender(Render3DEvent event) {
+    public void onRender3D(Render3DEvent event) {
         if (mc.player == null || mc.world == null) return;
         if (!Utils.canUpdate()) return;
 
+        // Anti cursor stack
+        if (moved) {
+            InvUtils.dropHand();
+            moved = false;
+        }
+
         Modules modules = Modules.get();
         AutoTotem autoTotem = modules.get(AutoTotem.class);
-        if (Modules.get().get(NFScaffold.class).hasWorked()) return;
+        if (Modules.get().get(DiggingTools.class).scaffoldPlaced()) return;
 
+        // Switch back if swap key has been used
         if (mc.options.swapHandsKey.isPressed() && !swapped && mc.player.getOffHandStack().getItem() == currentItem.item) swapped = true;
         else if (mc.options.swapHandsKey.isPressed() && swapped && mc.player.getMainHandStack().getItem() == currentItem.item) swapped = false;
         else swapped = false;
@@ -114,68 +129,80 @@ public class HandManager extends Module {
         if (mc.player.getOffHandStack().getItem() != currentItem.item && !swapped) {
             FindItemResult item = InvUtils.find(itemStack -> itemStack.getItem() == currentItem.item, hotbar.get() ? 0 : 9, 35);
 
-            if (!item.found()) item = InvUtils.find(itemStack -> itemStack.getItem() == null, hotbar.get() ? 0 : 9, 35);
-
             if (!item.found()) {
                 if (!sentMsg) {
                     if (warningMsg.get()) warning("Chosen item not found.");
                     sentMsg = true;
+                    moved = false;
                 }
             }
 
             // Swap to offhand
             else if (!autoTotem.isLocked() && !item.isOffhand()) {
                 InvUtils.move().from(item.slot()).toOffhand();
-                InvUtils.dropHand();
                 sentMsg = false;
+                moved = true;
             }
         }
+    }
 
-        // Checking if needed to eat
-        if (mc.player.getOffHandStack().getItem().isFood()) {
-            if (eating) {
-                if (shouldEat()) {
-                    startEating();
-                } else {
+    @EventHandler
+    private void onPreTick(TickEvent.Pre event) {
+        if (mc.player == null) return;
+
+        if (eating) {
+            // If we are eating check if we should still be eating
+            if (shouldEat()) {
+                // Check if the item in current slot is not an egap
+                if (mc.player.getOffHandStack().getComponents().get(DataComponentTypes.FOOD) == null) {
                     stopEating();
+                } else {
+                    startEating();
                 }
-            } else if (shouldEat()) {
+            } else {
+                stopEating(); // If we shouldn't be eating anymore then stop
+            }
+        } else {
+            // If we are not eating check if we should start eating
+            if (shouldEat() && mc.player.getOffHandStack().getComponents().get(DataComponentTypes.FOOD) != null) {
                 startEating();
             }
         }
     }
 
-    // Variables
     @EventHandler
-    private void onTick(TickEvent.Post event) {
+    private void onPostTick(TickEvent.Post event) {
         if (mc.player == null || mc.world == null) return;
 
         if (mc.player.getHealth() <= healthThreshold.get() || fallDamage.get() && !EntityUtils.isAboveWater(mc.player) && mc.player.fallDistance > 3) currentItem = Item.Totem;
-        else if (autoFireRes.get() && !mc.player.getActiveStatusEffects().containsKey(StatusEffects.FIRE_RESISTANCE)) currentItem = Item.EGap;
+        else if (autoFireRes.get() && !justStarted && !mc.player.getActiveStatusEffects().containsKey(StatusEffects.FIRE_RESISTANCE)) currentItem = Item.EGap;
         else if (mc.player.getHungerManager().getFoodLevel() < hungerThreshold.get() + 1) currentItem = Item.EGap;
         else currentItem = Item.Totem;
     }
 
     @EventHandler
-    public void sendPacket(PacketEvent.Receive event) {
+    public void onReceivePacket(PacketEvent.Receive event) {
         if (event.packet instanceof PlayerInteractBlockC2SPacket) stopEating();
     }
 
     private boolean shouldEat() {
-        return (mc.player.getHungerManager().getFoodLevel() <= hungerThreshold.get() || autoFireRes.get() && !mc.player.getActiveStatusEffects().containsKey(StatusEffects.FIRE_RESISTANCE)) && !Modules.get().get(NFScaffold.class).hasWorked();
+        return (mc.player.getHungerManager().getFoodLevel() <= hungerThreshold.get() || autoFireRes.get() && !mc.player.getActiveStatusEffects().containsKey(StatusEffects.FIRE_RESISTANCE)) && !Modules.get().get(DiggingTools.class).scaffoldPlaced();
     }
 
     private void startEating() {
-        if (mc.player == null || mc.world == null || mc.interactionManager == null) return;
+        if (mc.player == null || mc.interactionManager == null) return;
+
+        eating = true;
+        justStarted = false;
+
+        if (mc.player.isUsingItem()) return;
 
         mc.options.useKey.setPressed(true);
-        if (mc.player.isUsingItem()) return;
         mc.interactionManager.interactItem(mc.player, Hand.OFF_HAND);
-        eating = true;
     }
 
     private void stopEating() {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null) return;
 
         mc.options.useKey.setPressed(false);
         mc.player.stopUsingItem();
@@ -184,7 +211,7 @@ public class HandManager extends Module {
     }
 
     public boolean isEating() {
-        return eating;
+        return isActive() && eating;
     }
 
     public enum Item {

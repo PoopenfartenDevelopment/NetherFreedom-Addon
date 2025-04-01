@@ -17,7 +17,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import org.lwjgl.glfw.GLFW;
 
-public class NFRotation extends Module {
+public class RotationNF extends Module {
     private final SettingGroup sgYaw = settings.createGroup("Yaw");
     private final SettingGroup sgPitch = settings.createGroup("Pitch");
 
@@ -68,8 +68,8 @@ public class NFRotation extends Module {
 
     private boolean lDown, rDown;
 
-    public NFRotation() {
-        super(NFAddon.Main, "NF-rotation", "Changes/locks your yaw and pitch.");
+    public RotationNF() {
+        super(NFAddon.Main, "rotation-NF", "Changes/locks your yaw and pitch.");
     }
 
     @Override

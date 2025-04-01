@@ -110,7 +110,7 @@ public class BaritoneMiner extends Module {
     );
 
     public BaritoneMiner() {
-        super(NFAddon.Main, "BaritoneMiner", "Paths automatically (EXPERIMENTAL).");
+        super(NFAddon.Main, "baritone-miner-Beta", "Paths automatically (BETA).");
     }
 
     private BlockPos endOfLinePos, barPos, offsetPos, currPlayerPos, shulkerPlacePos, savedPos = null;
