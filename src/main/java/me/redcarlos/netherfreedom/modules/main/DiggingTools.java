@@ -59,6 +59,7 @@ public class DiggingTools extends Module {
         .name("block-list-mode")
         .description("Block list selection mode.")
         .defaultValue(ListMode.Whitelist)
+        .visible(scaffold::get)
         .build()
     );
 
@@ -66,7 +67,7 @@ public class DiggingTools extends Module {
         .name("whitelist")
         .description("Blocks allowed to scaffold.")
         .defaultValue(Blocks.NETHERRACK)
-        .visible(() -> listMode.get() == ListMode.Whitelist)
+        .visible(() -> scaffold.get() && listMode.get() == ListMode.Whitelist)
         .build()
     );
 
@@ -74,14 +75,14 @@ public class DiggingTools extends Module {
         .name("blacklist")
         .description("Blocks denied to scaffold.")
         .defaultValue(Blocks.OBSIDIAN)
-        .visible(() -> listMode.get() == ListMode.Blacklist)
+        .visible(() -> scaffold.get() && listMode.get() == ListMode.Blacklist)
         .build()
     );
 
     private final Setting<Integer> ext = sgScaffold.add(new IntSetting.Builder()
         .name("extend")
         .description("How much to place in front of you.")
-        .defaultValue(2)
+        .defaultValue(3)
         .range(0, 5)
         .visible(scaffold::get)
         .build()
@@ -90,7 +91,7 @@ public class DiggingTools extends Module {
     private final Setting<Boolean> keepY = sgScaffold.add(new BoolSetting.Builder()
         .name("keep-y")
         .description("Places blocks only at a specific Y value.")
-        .defaultValue(false)
+        .defaultValue(true)
         .visible(scaffold::get)
         .build()
     );
