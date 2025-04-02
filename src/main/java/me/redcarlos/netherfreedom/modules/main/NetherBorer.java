@@ -76,6 +76,10 @@ public class NetherBorer extends Module {
             breakBlock(right(forward(playerPos, i), 3).up());
             breakBlock(right(forward(playerPos, i), 3).up(2));
 
+            breakBlock(right(forward(playerPos, i), 4));
+            breakBlock(right(forward(playerPos, i), 4).up());
+            breakBlock(right(forward(playerPos, i), 4).up(2));
+
             breakBlock(left(forward(playerPos, i), 1));
             breakBlock(left(forward(playerPos, i), 1).up());
             breakBlock(left(forward(playerPos, i), 1).up(2));
@@ -87,6 +91,10 @@ public class NetherBorer extends Module {
             breakBlock(left(forward(playerPos, i), 3));
             breakBlock(left(forward(playerPos, i), 3).up());
             breakBlock(left(forward(playerPos, i), 3).up(2));
+
+            breakBlock(left(forward(playerPos, i), 4));
+            breakBlock(left(forward(playerPos, i), 4).up());
+            breakBlock(left(forward(playerPos, i), 4).up(2));
 
             breakBlock(backward(playerPos, i));
             breakBlock(backward(playerPos, i).up());
