@@ -19,7 +19,6 @@ import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
-import meteordevelopment.meteorclient.utils.misc.HorizontalDirection;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
@@ -115,7 +114,6 @@ public class BaritoneMiner extends Module {
     }
 
     private Direction toEndOfLineDir, toAdvanceDir, shulkerPlaceDir = null;
-    private HorizontalDirection dir = null;
     private BlockPos endOfLinePos, barPos, offsetPos, currPlayerPos, shulkerPlacePos, savedPos = null;
     private boolean offsetting, bindPressed, isPaused, refilling, placedShulker, defined = false;
     private int length, initialNetherrack, initialPicksBroken = 0;
@@ -128,8 +126,6 @@ public class BaritoneMiner extends Module {
         baritoneSettings.assumeWalkOnLava.value = true;
         baritoneSettings.allowPlace.value = true;
         baritoneSettings.mineScanDroppedItems.value = true;
-
-        dir = HorizontalDirection.get(mc.player.getYaw());
 
         if (!defined && !pathStart.get()) {
             start();
@@ -353,12 +349,11 @@ public class BaritoneMiner extends Module {
         setGoal(barPos);
     }
 
-
     // Finds the direction for one block to get to the other
     private Direction findBlockDir(BlockPos originBlock, BlockPos goalBlock) {
         // Very bad this can very easily break if the 2 blocks positions are not inline with each other
         BlockPos vec3d = BlockPos.ofFloored(Math.signum(goalBlock.getX() - originBlock.getX()), 0, Math.signum(goalBlock.getZ() - originBlock.getZ()));
-        return Direction.getFacing(Vec3d.of(vec3d)).getOpposite();
+        return Direction.getFacing(Vec3d.of(vec3d));
     }
 
     /**
@@ -381,12 +376,8 @@ public class BaritoneMiner extends Module {
     private int findDistance(BlockPos pos1, BlockPos pos2, Direction dir) {
         int dist = 0;
         switch (dir) {
-            case NORTH, SOUTH -> {
-                dist = Math.abs(pos1.getZ() - pos2.getZ());
-            }
-            case EAST, WEST -> {
-                dist = Math.abs(pos1.getX() - pos2.getX());
-            }
+            case NORTH -> dist = Math.abs(pos1.getZ() - pos2.getZ());
+            case WEST -> dist = Math.abs(pos1.getX() - pos2.getX());
         }
         return dist;
     }
