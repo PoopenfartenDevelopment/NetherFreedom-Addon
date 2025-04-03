@@ -22,6 +22,7 @@ import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
+import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import meteordevelopment.orbit.EventHandler;
@@ -376,8 +377,8 @@ public class BaritoneMiner extends Module {
     private int findDistance(BlockPos pos1, BlockPos pos2, Direction dir) {
         int dist = 0;
         switch (dir) {
-            case NORTH -> dist = Math.abs(pos1.getZ() - pos2.getZ());
-            case WEST -> dist = Math.abs(pos1.getX() - pos2.getX());
+            case NORTH, SOUTH, EAST, WEST -> dist = (int) PlayerUtils.distance(pos1.getX(), 0, pos1.getZ(), pos2.getX(), 0, pos2.getZ());
+            default -> {}
         }
         return dist;
     }
