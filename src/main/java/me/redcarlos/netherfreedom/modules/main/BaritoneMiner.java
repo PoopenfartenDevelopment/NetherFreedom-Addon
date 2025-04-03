@@ -352,7 +352,6 @@ public class BaritoneMiner extends Module {
 
     // Finds the direction for one block to get to the other
     private Direction findBlockDir(BlockPos originBlock, BlockPos goalBlock) {
-        // Very bad this can very easily break if the 2 blocks positions are not inline with each other
         BlockPos vec3d = BlockPos.ofFloored(Math.signum(goalBlock.getX() - originBlock.getX()), 0, Math.signum(goalBlock.getZ() - originBlock.getZ()));
         return Direction.getFacing(Vec3d.of(vec3d));
     }
@@ -373,7 +372,6 @@ public class BaritoneMiner extends Module {
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(goal));
     }
 
-    // Extremely monkey way of finding distance between 2 blocks
     private int findDistance(BlockPos pos1, BlockPos pos2, Direction dir) {
         int dist = 0;
         switch (dir) {
