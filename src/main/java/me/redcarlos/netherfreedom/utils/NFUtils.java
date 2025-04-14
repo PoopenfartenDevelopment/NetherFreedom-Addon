@@ -2,13 +2,7 @@ package me.redcarlos.netherfreedom.utils;
 
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import meteordevelopment.meteorclient.utils.misc.MeteorStarscript;
-import meteordevelopment.starscript.compiler.Compiler;
-import meteordevelopment.starscript.compiler.Parser;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 
@@ -119,14 +113,4 @@ public class NFUtils {
         add(Items.WHITE_SHULKER_BOX);
         add(Items.YELLOW_SHULKER_BOX);
     }};
-
-    public static int getNetherrack() {
-        Parser.Result result = Parser.parse("{player.get_stat(\"netherrack\",\"mined\")}");
-        return Integer.parseInt(String.valueOf(MeteorStarscript.ss.run(Compiler.compile(result))));
-    }
-
-    public static int getPickaxesBroken() {
-        Parser.Result result = Parser.parse("{player.get_stat(\"netherite_pickaxe\",\"broken\")}");
-        return Integer.parseInt(String.valueOf(MeteorStarscript.ss.run(Compiler.compile(result))));
-    }
 }

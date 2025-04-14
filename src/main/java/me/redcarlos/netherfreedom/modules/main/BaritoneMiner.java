@@ -20,12 +20,15 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
+import meteordevelopment.meteorclient.utils.misc.MeteorStarscript;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.starscript.compiler.Compiler;
+import meteordevelopment.starscript.compiler.Parser;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
@@ -96,7 +99,7 @@ public class BaritoneMiner extends Module {
         .build()
     );
 
-    private final Setting<Boolean> getPickaxe = sgGeneral.add(new BoolSetting.Builder()
+    private final Setting<Boolean> refillPicks = sgGeneral.add(new BoolSetting.Builder()
         .name("refill-pickaxes-from-shulker")
         .description("Refills pickaxes from shulkers when you run out.")
         .defaultValue(true)
@@ -111,13 +114,14 @@ public class BaritoneMiner extends Module {
     );
 
     public BaritoneMiner() {
-        super(NFAddon.Main, " [BETA]-baritone-miner ", "Paths to dig automatically.");
+        super(NFAddon.Main, "(BETA)-baritone-miner", "Paths to dig automatically.");
     }
 
     private Direction toEndOfLineDir, toAdvanceDir, shulkerPlaceDir = null;
     private BlockPos endOfLinePos, barPos, offsetPos, currPlayerPos, shulkerPlacePos, savedPos = null;
     private boolean offsetting, bindPressed, isPaused, refilling, placedShulker, defined = false;
-    private int length, initialNetherrack, initialPicksBroken = 0;
+    private int initialNetherrackMined, initialPicksBroken, finalNetherrackMined, finalPicksBroken;
+    private int length = 0;
 
     Modules modules = Modules.get();
 
@@ -138,18 +142,22 @@ public class BaritoneMiner extends Module {
 
         isPaused = false;
 
-        initialPicksBroken = NFUtils.getPickaxesBroken();
-        initialNetherrack = NFUtils.getNetherrack();
+        initialNetherrackMined = getNetherrackMined();
+        initialPicksBroken = getPicksBroken();
     }
 
     @Override
     public void onDeactivate() {
         baritone.getPathingBehavior().cancelEverything();
 
-        int finalNetherrack = NFUtils.getNetherrack();
-        int finalPickaxesBroken = NFUtils.getPickaxesBroken();
-        info("Blocks Broken: %d", (finalNetherrack - initialNetherrack));
-        info("Pickaxes used: %d", (finalPickaxesBroken - initialPicksBroken));
+        finalNetherrackMined = getNetherrackMined();
+        finalPicksBroken = getPicksBroken();
+
+        int netherrackMinedResult = getNetherrackResult();
+        int picksBrokenResult = getPickaxesResult();
+
+        info("Blocks mined: %d", netherrackMinedResult);
+        info("Pickaxes broken: %d", picksBrokenResult);
     }
 
     @EventHandler
@@ -162,7 +170,7 @@ public class BaritoneMiner extends Module {
             start();
         }
 
-        if (getPickAmount() == 0 && !placedShulker && getPickaxe.get()) {
+        if (getPickAmount() == 0 && !placedShulker && refillPicks.get()) {
             if (baritone.getPathingBehavior().isPathing()) baritone.getCommandManager().execute("pause");
             refilling = true;
             // Saves current goal, so it can later resume after refilling on pickaxes
@@ -421,5 +429,23 @@ public class BaritoneMiner extends Module {
         }
         info("Picks moved: " + picksMoved);
         return picksMoved;
+    }
+
+    private int getNetherrackMined() {
+        Parser.Result result = Parser.parse("{player.get_stat(\"netherrack\",\"mined\")}");
+        return Integer.parseInt(String.valueOf(MeteorStarscript.ss.run(Compiler.compile(result))));
+    }
+
+    private int getPicksBroken() {
+        Parser.Result result = Parser.parse("{player.get_stat(\"netherite_pickaxe\",\"broken\")}");
+        return Integer.parseInt(String.valueOf(MeteorStarscript.ss.run(Compiler.compile(result))));
+    }
+
+    private int getNetherrackResult() {
+        return (finalNetherrackMined - initialNetherrackMined);
+    }
+
+    private int getPickaxesResult() {
+        return (finalPicksBroken - initialPicksBroken);
     }
 }

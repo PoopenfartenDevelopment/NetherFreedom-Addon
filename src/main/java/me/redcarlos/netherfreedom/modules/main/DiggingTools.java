@@ -42,7 +42,7 @@ public class DiggingTools extends Module {
     );
 
     private final Setting<Boolean> useBaritone = sgGeneral.add(new BoolSetting.Builder()
-        .name("[BETA]-use-baritone")
+        .name("(BETA)-use-baritone")
         .description("Use baritone to automate the digging process.")
         .defaultValue(false)
         .build()

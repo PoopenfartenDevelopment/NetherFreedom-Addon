@@ -7,7 +7,8 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.Items;
+import net.minecraft.block.BannerBlock;
+import net.minecraft.block.SignBlock;
 import net.minecraft.item.PickaxeItem;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.util.Util;
@@ -105,7 +106,10 @@ public class NetherBorer extends Module {
     protected void breakBlock(BlockPos blockPos) {
         if (mc.player == null || mc.world == null) return;
 
-        if (!(mc.player.getMainHandStack().getItem() instanceof PickaxeItem) || packets >= 130 || mc.world.getBlockState(blockPos).isReplaceable()) {
+        // Added SignBlock and BannerBlock to preserve history :fire:
+        if (!(mc.player.getMainHandStack().getItem() instanceof PickaxeItem) || packets >= 130 || mc.world.getBlockState(blockPos).isReplaceable()
+            || mc.world.getBlockState(blockPos).getBlock() instanceof SignBlock
+            || mc.world.getBlockState(blockPos).getBlock() instanceof BannerBlock) {
             return;
         }
 
